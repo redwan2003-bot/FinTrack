@@ -97,7 +97,7 @@ export default function Reconciliation() {
 
       {/* FIX #8 — Double-entry balance assertion panel */}
       <motion.div
-        className={`mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 p-6 rounded-2xl border transition-all ${isBalanced ? 'bg-emerald-500/10 border-emerald-500/20 shadow-[0_8px_32px_rgba(16,185,129,0.05)]' : 'bg-red-500/10 border-red-500/20'}`}
+        className={`reconcile-panel ${isBalanced ? 'balanced' : 'unbalanced'}`}
         {...fadeUp(0)}
         role="status"
         aria-live="polite"
@@ -110,22 +110,22 @@ export default function Reconciliation() {
             <h3 className="text-base font-bold text-[var(--text-1)]">
               {isBalanced ? 'Ledger Balanced ✓' : 'Ledger Discrepancy Detected'}
             </h3>
-            <p className="text-xs text-[var(--text-3)] mt-1 max-w-md leading-relaxed">
+            <p className="text-xs text-[var(--text-3)] mt-1 max-w-md leading-relaxed font-medium">
               Every transaction has matching debit + credit entries. Double-entry integrity is verified and compliant.
             </p>
           </div>
         </div>
 
-        <div className="flex-shrink-0 grid grid-cols-3 gap-6 lg:gap-10 border-t lg:border-t-0 lg:border-l border-[rgba(255,255,255,0.05)] pt-6 lg:pt-0 lg:pl-10">
-          <div className="flex flex-col items-start lg:items-end min-w-[80px]">
+        <div className="reconcile-stats-grid">
+          <div className="flex flex-col items-start lg:items-end">
             <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Reconciled</span>
             <span className="text-2xl font-black text-emerald-400 leading-none">{reconciledCount}</span>
           </div>
-          <div className="flex flex-col items-start lg:items-end min-w-[80px]">
+          <div className="flex flex-col items-start lg:items-end">
             <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Pending</span>
             <span className="text-2xl font-black text-amber-400 leading-none">{pendingLedger.length}</span>
           </div>
-          <div className="flex flex-col items-start lg:items-end min-w-[120px]">
+          <div className="flex flex-col items-start lg:items-end">
             <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Ledger Net</span>
             <span className={`text-2xl font-black leading-none ${ledgerBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {formatCurrency(ledgerBalance)}

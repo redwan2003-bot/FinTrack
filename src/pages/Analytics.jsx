@@ -202,19 +202,19 @@ export default function Reports() {
         </div>
         {/* FIX #11: Tax year selector + export button */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="relative group">
-            <div className="flex items-center bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-xl px-4 py-2 hover:border-indigo-500/50 transition-all cursor-pointer">
-              <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mr-3">Tax Year</span>
+          <div className="custom-select-box group">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black">Tax Year</span>
+            <div className="relative flex items-center">
               <select
                 id="tax-year-select"
                 value={taxYear}
                 onChange={e => setTaxYear(Number(e.target.value))}
                 className="bg-transparent text-[var(--text-1)] text-sm font-bold outline-none cursor-pointer pr-4 appearance-none relative z-10"
-                style={{ minWidth: '80px' }}
+                style={{ minWidth: '70px' }}
               >
                 {TAX_YEARS.map(y => <option key={y} value={y} className="bg-[#0b0b1a]">{y}</option>)}
               </select>
-              <ChevronDown size={14} className="text-[var(--text-3)] absolute right-4 pointer-events-none group-hover:text-indigo-400 transition-colors" />
+              <ChevronDown size={14} className="text-[var(--text-3)] absolute right-0 pointer-events-none group-hover:text-indigo-400 transition-colors" />
             </div>
           </div>
           <button
@@ -229,33 +229,31 @@ export default function Reports() {
       {/* FIX #11: BD Tax estimate card */}
       {annualIncome > 0 && (
         <motion.div
-          className="mb-8 p-6 lg:p-8 rounded-3xl border border-indigo-500/20 bg-indigo-500/5 overflow-hidden relative"
+          className="tax-liability-card"
           {...fadeUp(0)}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <div className="lg:col-span-8">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                  <Calculator size={20} />
-                </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-3)] font-black">BD ESTIMATED TAX LIABILITY — {taxYear}</span>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <Calculator size={20} />
               </div>
-              <p className="text-4xl lg:text-5xl font-black text-indigo-400 tracking-tighter mb-4">
-                ৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}
-              </p>
-              <p className="text-xs text-[var(--text-3)] leading-relaxed max-w-xl font-medium">
-                Calculated based on NBR individual tax slabs for the {taxYear} fiscal period. 
-                This estimate assumes standard deductions and should be verified by a certified tax professional.
-              </p>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-3)] font-black">BD ESTIMATED TAX LIABILITY — {taxYear}</span>
             </div>
-            
-            <div className="lg:col-span-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-2xl p-6 flex flex-col lg:items-end">
-              <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Total Taxable Income</span>
-              <span className="text-3xl font-black text-[var(--text-1)] tracking-tight">{formatCurrency(annualIncome)}</span>
-            </div>
+            <p className="tax-val-large mb-4">
+              ৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}
+            </p>
+            <p className="text-xs text-[var(--text-3)] leading-relaxed max-w-xl font-medium">
+              Calculated based on NBR individual tax slabs for the {taxYear} fiscal period. 
+              This estimate assumes standard deductions and should be verified by a certified tax professional.
+            </p>
           </div>
           
-          {/* Decorative background element to prevent visual emptiness */}
+          <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-2xl p-6 flex flex-col lg:items-end relative z-10">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Total Taxable Income</span>
+            <span className="text-3xl font-black text-[var(--text-1)] tracking-tight">{formatCurrency(annualIncome)}</span>
+          </div>
+          
+          {/* Decorative background element */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] pointer-events-none rounded-full" />
         </motion.div>
       )}
