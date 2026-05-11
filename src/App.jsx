@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout         from './components/layout/Layout';
 import Dashboard      from './pages/Dashboard';
@@ -26,7 +26,7 @@ const SafePage = ({ element }) => (
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/FinTrack">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -65,7 +65,7 @@ export default function App() {
             <div className="text-center">
               <h1 className="text-6xl font-bold text-[var(--text-1)] mb-4">404</h1>
               <p className="text-[var(--text-2)] mb-6">Page not found</p>
-              <a href="/dashboard" className="btn btn-primary">Go to Dashboard</a>
+              <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
             </div>
           </div>
         } />
