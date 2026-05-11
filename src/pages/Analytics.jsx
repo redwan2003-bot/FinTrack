@@ -201,26 +201,27 @@ export default function Reports() {
           <p className="text-[var(--text-2)] text-sm">Analyze your spending and tax strategy</p>
         </div>
         {/* FIX #11: Tax year selector + export button */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-xl px-4 py-2">
-            <label htmlFor="tax-year-select" className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Tax Year</label>
-            <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="relative group">
+            <div className="flex items-center bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-xl px-4 py-2 hover:border-indigo-500/50 transition-all cursor-pointer">
+              <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mr-3">Tax Year</span>
               <select
                 id="tax-year-select"
                 value={taxYear}
                 onChange={e => setTaxYear(Number(e.target.value))}
-                className="bg-transparent text-[var(--text-1)] text-sm font-bold outline-none cursor-pointer appearance-none"
+                className="bg-transparent text-[var(--text-1)] text-sm font-bold outline-none cursor-pointer pr-4 appearance-none relative z-10"
+                style={{ minWidth: '80px' }}
               >
-                {TAX_YEARS.map(y => <option key={y} value={y} className="bg-[#1a1a2e]">{y}</option>)}
+                {TAX_YEARS.map(y => <option key={y} value={y} className="bg-[#0b0b1a]">{y}</option>)}
               </select>
-              <ChevronDown size={14} className="text-[var(--text-3)]" />
+              <ChevronDown size={14} className="text-[var(--text-3)] absolute right-4 pointer-events-none group-hover:text-indigo-400 transition-colors" />
             </div>
           </div>
           <button
-            className="btn btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex items-center gap-2 py-2.5"
+            className="btn btn-primary bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white px-6 shadow-none h-[42px]"
             onClick={exportTaxCSV}
           >
-            <Download size={16} aria-hidden="true" /> Export Tax CSV ({taxYear})
+            <Download size={16} /> <span className="hidden sm:inline">Export Tax CSV ({taxYear})</span><span className="sm:hidden">Export</span>
           </button>
         </div>
       </div>
@@ -228,24 +229,34 @@ export default function Reports() {
       {/* FIX #11: BD Tax estimate card */}
       {annualIncome > 0 && (
         <motion.div
-          className="card mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 overflow-hidden"
+          className="mb-8 p-6 lg:p-8 rounded-3xl border border-indigo-500/20 bg-indigo-500/5 overflow-hidden relative"
           {...fadeUp(0)}
-          style={{ background: 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.2)' }}
         >
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator size={18} className="text-indigo-400" />
-              <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">BD Estimated Tax Liability — {taxYear}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            <div className="lg:col-span-8">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                  <Calculator size={20} />
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-3)] font-black">BD ESTIMATED TAX LIABILITY — {taxYear}</span>
+              </div>
+              <p className="text-4xl lg:text-5xl font-black text-indigo-400 tracking-tighter mb-4">
+                ৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}
+              </p>
+              <p className="text-xs text-[var(--text-3)] leading-relaxed max-w-xl font-medium">
+                Calculated based on NBR individual tax slabs for the {taxYear} fiscal period. 
+                This estimate assumes standard deductions and should be verified by a certified tax professional.
+              </p>
             </div>
-            <p className="text-3xl font-black text-indigo-400">৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}</p>
-            <p className="text-xs text-[var(--text-3)] mt-2 leading-relaxed max-w-2xl">
-              Based on NBR individual tax slabs (simplified). Consult a tax professional for precise calculations.
-            </p>
+            
+            <div className="lg:col-span-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-2xl p-6 flex flex-col lg:items-end">
+              <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Total Taxable Income</span>
+              <span className="text-3xl font-black text-[var(--text-1)] tracking-tight">{formatCurrency(annualIncome)}</span>
+            </div>
           </div>
-          <div className="flex flex-col items-start lg:items-end bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)] flex-shrink-0 min-w-[200px]">
-            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold mb-1">Annual Income ({taxYear})</p>
-            <p className="text-2xl font-black text-[var(--text-1)]">{formatCurrency(annualIncome)}</p>
-          </div>
+          
+          {/* Decorative background element to prevent visual emptiness */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] pointer-events-none rounded-full" />
         </motion.div>
       )}
 

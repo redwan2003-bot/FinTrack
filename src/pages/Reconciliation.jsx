@@ -97,40 +97,39 @@ export default function Reconciliation() {
 
       {/* FIX #8 — Double-entry balance assertion panel */}
       <motion.div
-        className={`card mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border ${isBalanced ? 'reconcile-balanced' : 'reconcile-unbalanced'}`}
+        className={`mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 p-6 rounded-2xl border transition-all ${isBalanced ? 'bg-emerald-500/10 border-emerald-500/20 shadow-[0_8px_32px_rgba(16,185,129,0.05)]' : 'bg-red-500/10 border-red-500/20'}`}
         {...fadeUp(0)}
         role="status"
         aria-live="polite"
-        aria-label={isBalanced ? 'Ledger is balanced' : 'Ledger has discrepancies'}
       >
-        <div className="flex items-center gap-3">
-          {isBalanced
-            ? <Scale size={22} className="text-emerald-400 flex-shrink-0" aria-hidden="true" />
-            : <XCircle size={22} className="text-red-400 flex-shrink-0" aria-hidden="true" />
-          }
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isBalanced ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+            {isBalanced ? <Scale size={24} /> : <AlertCircle size={24} />}
+          </div>
           <div>
-            <p className="font-semibold text-sm text-[var(--text-1)]">
+            <h3 className="text-base font-bold text-[var(--text-1)]">
               {isBalanced ? 'Ledger Balanced ✓' : 'Ledger Discrepancy Detected'}
-            </p>
-            <p className="text-xs text-[var(--text-2)] mt-0.5">
-              Every transaction has matching debit + credit entries. Debits = Credits (double-entry verified).
+            </h3>
+            <p className="text-xs text-[var(--text-3)] mt-1 max-w-md leading-relaxed">
+              Every transaction has matching debit + credit entries. Double-entry integrity is verified and compliant.
             </p>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-end md:items-center flex-shrink-0">
-          <div className="flex flex-col items-end">
-            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Reconciled</p>
-            <p className="text-xl font-bold text-emerald-400 leading-none mt-1">{reconciledCount}</p>
+
+        <div className="flex-shrink-0 grid grid-cols-3 gap-6 lg:gap-10 border-t lg:border-t-0 lg:border-l border-[rgba(255,255,255,0.05)] pt-6 lg:pt-0 lg:pl-10">
+          <div className="flex flex-col items-start lg:items-end min-w-[80px]">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Reconciled</span>
+            <span className="text-2xl font-black text-emerald-400 leading-none">{reconciledCount}</span>
           </div>
-          <div className="flex flex-col items-end border-l border-[rgba(255,255,255,0.05)] pl-4 md:pl-8">
-            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Pending</p>
-            <p className="text-xl font-bold text-amber-400 leading-none mt-1">{pendingLedger.length}</p>
+          <div className="flex flex-col items-start lg:items-end min-w-[80px]">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Pending</span>
+            <span className="text-2xl font-black text-amber-400 leading-none">{pendingLedger.length}</span>
           </div>
-          <div className="flex flex-col items-end border-l border-[rgba(255,255,255,0.05)] pl-4 md:pl-8">
-            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Ledger Net</p>
-            <p className={`text-xl font-bold leading-none mt-1 ${ledgerBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div className="flex flex-col items-start lg:items-end min-w-[120px]">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-black mb-1">Ledger Net</span>
+            <span className={`text-2xl font-black leading-none ${ledgerBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {formatCurrency(ledgerBalance)}
-            </p>
+            </span>
           </div>
         </div>
       </motion.div>
@@ -194,7 +193,7 @@ export default function Reconciliation() {
                     }`}
                   >
                     <div className="flex justify-between items-start gap-4 mb-1">
-                      <span className="text-sm font-medium text-[var(--text-1)] leading-tight">{line.description}</span>
+                      <span className="text-sm font-medium text-[var(--text-1)] leading-tight break-words overflow-hidden">{line.description}</span>
                       <span className={`text-sm font-bold flex-shrink-0 ${line.amountCents > 0 ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
                         {line.amountCents > 0 ? '+' : ''}{formatCurrency(Math.abs(line.amountCents))}
                       </span>
@@ -233,7 +232,7 @@ export default function Reconciliation() {
                       }`}
                     >
                       <div className="flex justify-between items-start gap-4 mb-1">
-                        <span className="text-sm font-medium text-[var(--text-1)] leading-tight">{txn.description || txn.merchantName || 'Untitled'}</span>
+                        <span className="text-sm font-medium text-[var(--text-1)] leading-tight break-words overflow-hidden">{txn.description || txn.merchantName || 'Untitled'}</span>
                         <span className={`text-sm font-bold flex-shrink-0 ${txn.type === 'income' ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
                           {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amountCents)}
                         </span>
