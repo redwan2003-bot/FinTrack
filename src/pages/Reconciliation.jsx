@@ -117,18 +117,18 @@ export default function Reconciliation() {
             </p>
           </div>
         </div>
-        <div className="flex gap-6 text-right flex-shrink-0">
-          <div>
-            <p className="text-xs text-[var(--text-2)]">Reconciled</p>
-            <p className="text-lg font-bold text-emerald-400">{reconciledCount}</p>
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-end md:items-center flex-shrink-0">
+          <div className="flex flex-col items-end">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Reconciled</p>
+            <p className="text-xl font-bold text-emerald-400 leading-none mt-1">{reconciledCount}</p>
           </div>
-          <div>
-            <p className="text-xs text-[var(--text-2)]">Pending</p>
-            <p className="text-lg font-bold text-amber-400">{pendingLedger.length}</p>
+          <div className="flex flex-col items-end border-l border-[rgba(255,255,255,0.05)] pl-4 md:pl-8">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Pending</p>
+            <p className="text-xl font-bold text-amber-400 leading-none mt-1">{pendingLedger.length}</p>
           </div>
-          <div>
-            <p className="text-xs text-[var(--text-2)]">Ledger Net</p>
-            <p className={`text-lg font-bold ${ledgerBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div className="flex flex-col items-end border-l border-[rgba(255,255,255,0.05)] pl-4 md:pl-8">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Ledger Net</p>
+            <p className={`text-xl font-bold leading-none mt-1 ${ledgerBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {formatCurrency(ledgerBalance)}
             </p>
           </div>
@@ -193,9 +193,9 @@ export default function Reconciliation() {
                         : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.1)]'
                     }`}
                   >
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="text-sm font-medium text-[var(--text-1)]">{line.description}</span>
-                      <span className={`text-sm font-bold ${line.amountCents > 0 ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
+                    <div className="flex justify-between items-start gap-4 mb-1">
+                      <span className="text-sm font-medium text-[var(--text-1)] leading-tight">{line.description}</span>
+                      <span className={`text-sm font-bold flex-shrink-0 ${line.amountCents > 0 ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
                         {line.amountCents > 0 ? '+' : ''}{formatCurrency(Math.abs(line.amountCents))}
                       </span>
                     </div>
@@ -232,9 +232,9 @@ export default function Reconciliation() {
                           : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.1)]'
                       }`}
                     >
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="text-sm font-medium text-[var(--text-1)]">{txn.description || txn.merchantName || 'Untitled'}</span>
-                        <span className={`text-sm font-bold ${txn.type === 'income' ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
+                      <div className="flex justify-between items-start gap-4 mb-1">
+                        <span className="text-sm font-medium text-[var(--text-1)] leading-tight">{txn.description || txn.merchantName || 'Untitled'}</span>
+                        <span className={`text-sm font-bold flex-shrink-0 ${txn.type === 'income' ? 'text-emerald-400' : 'text-[var(--text-1)]'}`}>
                           {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amountCents)}
                         </span>
                       </div>

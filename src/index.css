@@ -677,13 +677,37 @@ select.form-input option { background: #1a1a2e; }
   gap: 14px;
 }
 .report-tile {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--r-xl); padding: 20px 22px;
-  transition: border-color var(--t);
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.report-tile:hover { border-color: var(--border-hover); }
-.report-tile-val   { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.report-tile-label { font-size: 12.5px; color: var(--text-3); font-weight: 500; }
+
+.report-tile:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -12px rgba(124, 58, 237, 0.3);
+}
+
+.report-tile-val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.report-tile-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
 
 /* ═══════════════════════════════════════
    EMPTY STATE
@@ -848,13 +872,17 @@ select.form-input option { background: #1a1a2e; }
 /* ═══════════════════════════════════════
    FIX #8 — Reconciliation balance styles
 ═══════════════════════════════════════ */
-.reconcile-balanced {
-  background: rgba(34,197,94,0.08);
-  border-color: rgba(34,197,94,0.25);
+.reconcile-balanced { 
+  background: rgba(16, 185, 129, 0.08); 
+  border-color: rgba(16, 185, 129, 0.2); 
+  padding: 1.5rem;
+  border-radius: 16px;
 }
-.reconcile-unbalanced {
-  background: rgba(239,68,68,0.08);
-  border-color: rgba(239,68,68,0.25);
+.reconcile-unbalanced { 
+  background: rgba(239, 68, 68, 0.08); 
+  border-color: rgba(239, 68, 68, 0.2); 
+  padding: 1.5rem;
+  border-radius: 16px;
 }
 
 /* ═══════════════════════════════════════

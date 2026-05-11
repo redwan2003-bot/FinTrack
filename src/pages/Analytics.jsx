@@ -201,23 +201,26 @@ export default function Reports() {
           <p className="text-[var(--text-2)] text-sm">Analyze your spending and tax strategy</p>
         </div>
         {/* FIX #11: Tax year selector + export button */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-2 bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-1.5">
-            <label htmlFor="tax-year-select" className="text-xs text-[var(--text-2)] font-medium">Tax Year:</label>
-            <select
-              id="tax-year-select"
-              value={taxYear}
-              onChange={e => setTaxYear(Number(e.target.value))}
-              className="bg-transparent text-[var(--text-1)] text-sm font-semibold outline-none cursor-pointer"
-            >
-              {TAX_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-xl px-4 py-2">
+            <label htmlFor="tax-year-select" className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">Tax Year</label>
+            <div className="flex items-center gap-1">
+              <select
+                id="tax-year-select"
+                value={taxYear}
+                onChange={e => setTaxYear(Number(e.target.value))}
+                className="bg-transparent text-[var(--text-1)] text-sm font-bold outline-none cursor-pointer appearance-none"
+              >
+                {TAX_YEARS.map(y => <option key={y} value={y} className="bg-[#1a1a2e]">{y}</option>)}
+              </select>
+              <ChevronDown size={14} className="text-[var(--text-3)]" />
+            </div>
           </div>
           <button
-            className="btn btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex items-center gap-2"
+            className="btn btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex items-center gap-2 py-2.5"
             onClick={exportTaxCSV}
           >
-            <Calculator size={16} aria-hidden="true" /> Export Tax CSV ({taxYear})
+            <Download size={16} aria-hidden="true" /> Export Tax CSV ({taxYear})
           </button>
         </div>
       </div>
@@ -225,18 +228,23 @@ export default function Reports() {
       {/* FIX #11: BD Tax estimate card */}
       {annualIncome > 0 && (
         <motion.div
-          className="card mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          className="card mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 overflow-hidden"
           {...fadeUp(0)}
           style={{ background: 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.2)' }}
         >
-          <div>
-            <p className="text-xs uppercase tracking-wider text-[var(--text-2)] font-semibold mb-1">BD Estimated Tax Liability — {taxYear}</p>
-            <p className="text-2xl font-bold text-indigo-400">৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}</p>
-            <p className="text-xs text-[var(--text-2)] mt-1">Based on NBR individual tax slabs (simplified). Consult a tax professional for precise calculations.</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Calculator size={18} className="text-indigo-400" />
+              <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold">BD Estimated Tax Liability — {taxYear}</p>
+            </div>
+            <p className="text-3xl font-black text-indigo-400">৳{estimatedTax.toLocaleString('en-BD', { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs text-[var(--text-3)] mt-2 leading-relaxed max-w-2xl">
+              Based on NBR individual tax slabs (simplified). Consult a tax professional for precise calculations.
+            </p>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-[var(--text-2)]">Annual Income ({taxYear})</p>
-            <p className="text-lg font-semibold text-[var(--text-1)]">{formatCurrency(annualIncome)}</p>
+          <div className="flex flex-col items-start lg:items-end bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)] flex-shrink-0 min-w-[200px]">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--text-3)] font-bold mb-1">Annual Income ({taxYear})</p>
+            <p className="text-2xl font-black text-[var(--text-1)]">{formatCurrency(annualIncome)}</p>
           </div>
         </motion.div>
       )}
