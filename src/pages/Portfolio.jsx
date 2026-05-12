@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { usePortfolioStore } from '../store/usePortfolioStore';
+import { useTransactionStore } from '../store/useTransactionStore';
 import { formatCurrency, toCents, fromCents } from '../utils/currency';
 import Modal from '../components/ui/Modal';
 import StatCard from '../components/ui/StatCard';
@@ -101,12 +102,15 @@ function PortfolioForm({ onClose, existing }) {
 
 export default function Portfolio() {
   const { accounts, deleteAccount, getTotalAssets, getTotalLiabilities, getNetWorth } = usePortfolioStore();
+  const { getBalance } = useTransactionStore();
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
 
   const assets = accounts.filter(a => a.type === 'asset');
   const liabilities = accounts.filter(a => a.type === 'liability');
-  const netWorth = getNetWorth();
+  const cashBalance = getBalance();
+  const portfolioNetWorth = getNetWorth();
+  const unifiedNetWorth = portfolioNetWorth + cashBalance;
 
   const handleDelete = (id) => {
     deleteAccount(id);
@@ -161,8 +165,8 @@ export default function Portfolio() {
       </div>
 
       <div className="stats-grid mb-8">
-        <StatCard label="Total Net Worth" value={formatCurrency(netWorth)} icon={Briefcase} accent="#8b5cf6" delay={0} />
-        <StatCard label="Total Assets" value={formatCurrency(getTotalAssets())} icon={TrendingUp} accent="#10b981" delay={0.1} />
+        <StatCard label="Total Net Worth" value={formatCurrency(unifiedNetWorth)} icon={Briefcase} accent="#8b5cf6" delay={0} />
+        <StatCard label="Total Assets" value={formatCurrency(getTotalAssets() + cashBalance)} icon={TrendingUp} accent="#10b981" delay={0.1} />
         <StatCard label="Total Liabilities" value={formatCurrency(getTotalLiabilities())} icon={TrendingDown} accent="#ef4444" delay={0.2} />
       </div>
 

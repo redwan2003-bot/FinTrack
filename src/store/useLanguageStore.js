@@ -10,6 +10,8 @@ export const useLanguageStore = create(
     }),
     {
       name: 'fintrack-lang-storage',
+      version: 1,
+      migrate: (persistedState) => persistedState,
     }
   )
 );

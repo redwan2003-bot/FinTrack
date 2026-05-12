@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { useTransactionStore } from '../../store/useTransactionStore';
 import { CATEGORIES } from '../../utils/categories';
 import { toCents } from '../../utils/currency';
+import { sanitizeText, sanitizeName } from '../../utils/security';
 import toast from 'react-hot-toast';
 
 const schema = z.object({
@@ -31,13 +32,21 @@ export default function TransactionForm({ onClose, existing }) {
   useEffect(() => {
     if (activeType === 'income') {
       setValue('categoryId', 'income');
-    } else if (getValues('categoryId') === 'income') {
-      setValue('categoryId', 'food');
+    } else {
+      // If we switched from income back to expense, reset category to food
+      if (getValues('categoryId') === 'income') {
+        setValue('categoryId', 'food');
+      }
     }
-  }, [activeType, setValue, getValues]);
+  }, [activeType, setValue]); // getValues removed to fix UX-02
 
   const onSubmit = (data) => {
-    const payload = { ...data, amountCents: toCents(data.amount) };
+    const payload = { 
+      ...data, 
+      description: sanitizeText(data.description),
+      merchantName: sanitizeName(data.merchantName),
+      amountCents: toCents(data.amount) 
+    };
     if (existing) {
       updateTransaction(existing.id, payload);
       toast.success('Transaction updated');

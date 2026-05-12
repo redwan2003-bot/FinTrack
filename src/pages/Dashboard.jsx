@@ -51,9 +51,6 @@ export default function Dashboard() {
 
   return (
     <div className="page">
-      {/* Skip navigation for keyboard / screen reader users — FIX #7 */}
-      <a href="#main-content" className="skip-link">Skip to main content</a>
-
       {/* Page Header */}
       <div className="page-header">
         <div />
@@ -62,8 +59,6 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Stat Cards — FIX #8: real trend percentages */}
-      <main id="main-content">
         <div className="stats-grid">
           <StatCard
             label="Net Worth"
@@ -160,7 +155,6 @@ export default function Dashboard() {
             </div>
           )}
         </motion.div>
-      </main>
 
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t('add_transaction')}>
         <TransactionForm onClose={() => setShowAdd(false)} />

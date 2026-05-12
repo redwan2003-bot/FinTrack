@@ -70,7 +70,7 @@ export default function LoginForm({
             >
                 <img 
                     style={{ position: 'absolute', inset: 0, height: '100%', width: '100%', objectFit: 'cover' }}
-                    src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/leftSideImage.png" 
+                    src="/login-hero.png" 
                     alt="Financial background" 
                 />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent, #0b0b1a)' }}></div>
@@ -140,7 +140,7 @@ export default function LoginForm({
                         }}
                     >
                         <img 
-                            src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleLogo.svg" 
+                            src="/google-logo.svg" 
                             alt="Google" 
                             style={{ width: '20px', height: '20px' }}
                         />

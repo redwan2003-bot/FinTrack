@@ -48,16 +48,16 @@ export default function App() {
           },
           success: { iconTheme: { primary: '#22c55e', secondary: '#1a1a2e' } },
           error:   { iconTheme: { primary: '#ef4444', secondary: '#1a1a2e' } },
+          ariaProps: {
+            role: 'status',
+            'aria-live': 'polite',
+          },
         }}
       />
       <Routes>
         <Route path="/login" element={<Auth />} />
 
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }>
+        <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard"      element={<SafePage element={<Dashboard />} />} />
           <Route path="transactions"   element={<SafePage element={<Transactions />} />} />

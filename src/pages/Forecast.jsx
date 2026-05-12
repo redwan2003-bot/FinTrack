@@ -53,8 +53,15 @@ export default function Forecast() {
     }).reverse();
   }, [active]);
 
-  const avgIncome  = last3.reduce((s, m) => s + m.income, 0) / 3;
-  const avgExpense = last3.reduce((s, m) => s + m.expense, 0) / 3;
+  const { avgIncome, avgExpense, activeMonthCount } = useMemo(() => {
+    const activeMonths = last3.filter(m => m.income > 0 || m.expense > 0);
+    const count = activeMonths.length || 1;
+    return {
+      avgIncome: last3.reduce((s, m) => s + m.income, 0) / count,
+      avgExpense: last3.reduce((s, m) => s + m.expense, 0) / count,
+      activeMonthCount: activeMonths.length
+    };
+  }, [last3]);
 
   // Project next 6 months
   const projections = useMemo(() => {
@@ -94,7 +101,7 @@ export default function Forecast() {
       <div className="page-header flex justify-between items-center mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-1)]">Rolling Forecast</h1>
-          <p className="text-[var(--text-2)] text-sm">6-month projection based on your last 3 months average</p>
+          <p className="text-[var(--text-2)] text-sm">6-month projection based on your last {activeMonthCount} months average</p>
         </div>
 
         {/* Scenario selector */}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import { format, subDays } from 'date-fns';
+import { format, subDays, parseISO, isBefore, isEqual } from 'date-fns';
 
 const d = (daysAgo) => format(subDays(new Date(), daysAgo), 'yyyy-MM-dd');
 const m = (monthsAgo, day) =>
@@ -57,29 +57,35 @@ const SEED = [
 ];
 
 /**
- * FIX #1 — Shift seed dates to stay "fresh" for returning users.
- * If the latest seed transaction is more than 7 days old, we shift all seed
- * transaction dates forward to be relative to today. This prevents "stale"
- * seed data from breaking the month-over-month deltas.
+ * FIX #1 — Prevent infinite seed drift (BUG-01).
+ * Instead of shifting dates on every load, we use a SEED_VERSION.
+ * If the version changes, we can perform a one-time migration.
  */
-const refreshSeedDates = (txns) => {
-  const seedTxns = txns.filter(t => t.id.startsWith('s'));
-  if (seedTxns.length === 0) return txns;
+const SEED_VERSION = 'v2.1';
+const refreshSeedDates = (state) => {
+  if (state.seedVersion === SEED_VERSION) return state.transactions;
   
+  // First time load: shift seeds to be relative to today once
+  const seedTxns = state.transactions.filter(t => t.id.startsWith('s'));
+  if (seedTxns.length === 0) return state.transactions;
+
   const latestSeed = new Date(Math.max(...seedTxns.map(t => new Date(t.date))));
   const today = new Date();
-  const diffTime = today - latestSeed;
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor((today - latestSeed) / (1000 * 60 * 60 * 24));
 
-  if (diffDays > 7) {
-    return txns.map(t => {
+  if (diffDays > 0) {
+    const newTxns = state.transactions.map(t => {
       if (!t.id.startsWith('s')) return t;
       const d = new Date(t.date);
       d.setDate(d.getDate() + diffDays);
       return { ...t, date: format(d, 'yyyy-MM-dd') };
     });
+    state.seedVersion = SEED_VERSION;
+    return newTxns;
   }
-  return txns;
+  
+  state.seedVersion = SEED_VERSION;
+  return state.transactions;
 };
 
 /**
@@ -99,9 +105,13 @@ export const useTransactionStore = create(
 
       addTransaction: (data) =>
         set((s) => {
-          if (s.lockDate && data.date && data.date <= s.lockDate) {
-            console.warn(`Cannot add transaction before lock date: ${s.lockDate}`);
-            return s;
+          if (s.lockDate && data.date) {
+            const txnDate = parseISO(data.date);
+            const lockDate = parseISO(s.lockDate);
+            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
+              console.warn(`Cannot add transaction on or before lock date: ${s.lockDate}`);
+              return s;
+            }
           }
           let debitAccount = 'unknown';
           let creditAccount = 'unknown';
@@ -123,13 +133,21 @@ export const useTransactionStore = create(
       updateTransaction: (id, data) =>
         set((s) => {
           const txn = s.transactions.find((t) => t.id === id);
-          if (s.lockDate && txn && txn.date <= s.lockDate) {
-            console.warn(`Cannot edit transaction before lock date: ${s.lockDate}`);
-            return s;
+          if (s.lockDate && txn) {
+            const txnDate = parseISO(txn.date);
+            const lockDate = parseISO(s.lockDate);
+            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
+              console.warn(`Cannot edit transaction on or before lock date: ${s.lockDate}`);
+              return s;
+            }
           }
-          if (s.lockDate && data.date && data.date <= s.lockDate) {
-            console.warn(`Cannot move transaction to before lock date: ${s.lockDate}`);
-            return s;
+          if (s.lockDate && data.date) {
+            const newDate = parseISO(data.date);
+            const lockDate = parseISO(s.lockDate);
+            if (isBefore(newDate, lockDate) || isEqual(newDate, lockDate)) {
+              console.warn(`Cannot move transaction to on or before lock date: ${s.lockDate}`);
+              return s;
+            }
           }
           return {
             transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...data } : t)),
@@ -140,13 +158,16 @@ export const useTransactionStore = create(
         set((s) => {
           const txn = s.transactions.find((t) => t.id === id);
           if (!txn || txn.status === 'voided') return s;
-          if (s.lockDate && txn.date <= s.lockDate) {
-            console.warn(`Cannot void transaction before lock date: ${s.lockDate}`);
-            return s;
+          if (s.lockDate && txn) {
+            const txnDate = parseISO(txn.date);
+            const lockDate = parseISO(s.lockDate);
+            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
+              console.warn(`Cannot void transaction on or before lock date: ${s.lockDate}`);
+              return s;
+            }
           }
           if (txn.status === 'reconciled') {
-            console.warn('Cannot directly void a reconciled transaction.');
-            return s;
+            throw new Error('RECONCILED_LOCKED');
           }
 
           /**
@@ -262,9 +283,11 @@ export const useTransactionStore = create(
     }),
     { 
       name: 'fintrack-transactions-v2',
+      version: 1,
+      migrate: (persistedState) => persistedState,
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.transactions = refreshSeedDates(state.transactions);
+          state.transactions = refreshSeedDates(state);
         }
       }
     }

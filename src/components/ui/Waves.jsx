@@ -253,6 +253,10 @@ export function Waves({
 
     // Initialization
     useEffect(() => {
+        // PERF-01: Respect reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (prefersReducedMotion) return
+
         const container = containerRef.current
         if (!container || !svgRef.current) return
 
@@ -268,6 +272,16 @@ export function Waves({
         window.addEventListener('mousemove', onMouseMove)
         container.addEventListener('touchmove', onTouchMove, { passive: false })
 
+        // PERF-01: Pause on hidden tab
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (rafRef.current) cancelAnimationFrame(rafRef.current)
+            } else {
+                rafRef.current = requestAnimationFrame(tick)
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
         // Start animation
         rafRef.current = requestAnimationFrame(tick)
 
@@ -276,6 +290,7 @@ export function Waves({
             window.removeEventListener('resize', onResize)
             window.removeEventListener('mousemove', onMouseMove)
             container?.removeEventListener('touchmove', onTouchMove)
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

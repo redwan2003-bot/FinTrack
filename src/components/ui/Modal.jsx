@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -18,7 +18,7 @@ const FOCUSABLE = [
 export default function Modal({ open, onClose, title, children, width = 480 }) {
   const modalRef = useRef(null);
   const previousFocusRef = useRef(null);
-  const titleId = `modal-title-${Math.random().toString(36).slice(2)}`;
+  const titleId = useId();
 
   // Save the element that was focused before the modal opened
   useEffect(() => {

@@ -19,8 +19,17 @@ export const useAuthStore = create(
           },
         });
       },
-      logout: () => set({ isAuthenticated: false, user: null }),
+      logout: () => {
+        set({ isAuthenticated: false, user: null });
+        localStorage.removeItem('fintrack-transactions-v2');
+        localStorage.removeItem('fintrack-budgets-v1');
+        localStorage.removeItem('fintrack-portfolio-v1');
+      },
     }),
-    { name: 'fintrack-auth-v1' }
+    {
+      name: 'fintrack-auth-v1',
+      version: 1,
+      migrate: (persistedState) => persistedState,
+    }
   )
 );

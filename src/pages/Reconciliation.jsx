@@ -23,22 +23,31 @@ export default function Reconciliation() {
   );
 
   /**
-   * FIX #8 — Double-entry balance assertion:
-   * Sum of all debits on active transactions should equal sum of credits.
-   * In a proper double-entry ledger, total debits = total credits at all times.
+   * FIX #8 — Double-entry balance assertion (BUG-02):
+   * In a proper double-entry ledger, every transaction must map to exactly
+   * one debit account and one credit account.
    */
-  const { totalDebits, totalCredits, isBalanced } = useMemo(() => {
+  const { totalDebits, totalCredits, isBalanced, unbalancedCount } = useMemo(() => {
     const active = transactions.filter(t => t.status !== 'voided' && t.status !== 'reversal');
-    // All income transactions: debit cash (asset), credit revenue
-    // All expense transactions: debit expense account, credit cash (asset)
-    // Net effect: total income amountCents = total expense amountCents + net balance
-    // Simplified: check that sum of income cents = sum of debit entries
-    const debits  = active.filter(t => t.type === 'income').reduce((s, t) => s + t.amountCents, 0)
-                  + active.filter(t => t.type === 'expense').reduce((s, t) => s + t.amountCents, 0);
-    const credits = active.filter(t => t.type === 'income').reduce((s, t) => s + t.amountCents, 0)
-                  + active.filter(t => t.type === 'expense').reduce((s, t) => s + t.amountCents, 0);
-    // True double-entry: for each txn, debitAccount amt = creditAccount amt, so debits always = credits
-    return { totalDebits: debits, totalCredits: credits, isBalanced: true };
+    
+    // Summing active debits and credits
+    const debits = active.reduce((s, t) => s + (t.type === 'income' || t.type === 'expense' ? t.amountCents : 0), 0);
+    const credits = active.reduce((s, t) => s + (t.type === 'income' || t.type === 'expense' ? t.amountCents : 0), 0);
+
+    // Identifying entries missing double-entry metadata
+    const unbalanced = active.filter(t => 
+      !t.debitAccount || 
+      !t.creditAccount || 
+      t.debitAccount === 'unknown' || 
+      t.creditAccount === 'unknown'
+    );
+
+    return { 
+      totalDebits: debits, 
+      totalCredits: credits, 
+      isBalanced: unbalanced.length === 0,
+      unbalancedCount: unbalanced.length
+    };
   }, [transactions]);
 
   // Unreconciled discrepancy: net sum should be 0 if all entries are balanced
@@ -104,10 +113,12 @@ export default function Reconciliation() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-[var(--text-1)]">
-              {isBalanced ? 'Ledger Balanced ✓' : 'Ledger Discrepancy Detected'}
+              {isBalanced ? 'Ledger Balanced ✓' : `Ledger Discrepancy Detected (${unbalancedCount})`}
             </h3>
             <p className="text-sm text-[var(--text-3)] mt-1 max-w-md leading-relaxed font-medium">
-              Every transaction has matching debit + credit entries. Double-entry integrity is verified and compliant.
+              {isBalanced 
+                ? 'Every transaction has matching debit + credit entries. Double-entry integrity is verified and compliant.'
+                : `There are ${unbalancedCount} transactions missing valid double-entry account mappings. Please review your ledger for integrity.`}
             </p>
           </div>
         </div>

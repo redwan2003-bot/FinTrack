@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from '../../lib/i18n';
 import { useLanguageStore } from '../../store/useLanguageStore';
 import { useTransactionStore } from '../../store/useTransactionStore';
+import { usePortfolioStore } from '../../store/usePortfolioStore';
+import { useBudgetStore } from '../../store/useBudgetStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import Modal from '../ui/Modal';
 
@@ -31,8 +33,9 @@ export default function Header({ onMenuClick }) {
   const lang = useLanguageStore(state => state.lang);
   const lockDate = useTransactionStore(state => state.lockDate);
   const setLockDate = useTransactionStore(state => state.setLockDate);
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const [pendingTheme, setPendingTheme] = useState(theme);
 
   useEffect(() => {
     if (theme === 'system') {
@@ -69,6 +72,42 @@ export default function Header({ onMenuClick }) {
     }
   };
 
+  const handleExport = () => {
+    const data = {
+      transactions: useTransactionStore.getState().transactions,
+      budgets: useBudgetStore.getState().budgets,
+      portfolio: usePortfolioStore.getState().accounts,
+      exportedAt: new Date().toISOString(),
+      version: 'v1.0'
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fintrack-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    toast.success('Backup downloaded!');
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.transactions) useTransactionStore.setState({ transactions: data.transactions });
+        if (data.budgets) useBudgetStore.setState({ budgets: data.budgets });
+        if (data.portfolio) usePortfolioStore.setState({ accounts: data.portfolio });
+        toast.success('Data imported successfully!');
+        window.location.reload(); // Refresh to reflect all changes
+      } catch (err) {
+        toast.error('Invalid backup file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const notifications = [
     { id: 1, text: 'Budget exceeded: Food & Dining', type: 'error', time: '2h ago' },
     { id: 2, text: 'Large income received: Freelance Project', type: 'success', time: '5h ago' },
@@ -98,11 +137,12 @@ export default function Header({ onMenuClick }) {
           />
         </form>
 
-        {/* Language Toggle */}
+        {/* Language Toggle (FIX UX-05) */}
         <button 
           className="header-icon-btn" 
           onClick={toggleLang}
-          title={`Switch to ${lang === 'en' ? 'Bengali' : 'English'}`}
+          title={lang === 'en' ? 'Switch to Bengali' : 'Switch to English'}
+          aria-label={lang === 'en' ? 'Switch to Bengali' : 'Switch to English'}
         >
           <span style={{ fontSize: '13px', fontWeight: 'bold', fontFamily: 'var(--font-handwritten)' }}>
             {lang === 'en' ? 'BN' : 'EN'}
@@ -147,47 +187,65 @@ export default function Header({ onMenuClick }) {
           </AnimatePresence>
         </div>
 
-        {/* Profile */}
+        {/* Profile / Login */}
         <div className="dropdown-container" ref={profileRef}>
-          <div 
-            className="header-avatar" 
-            onClick={() => setShowProfile(!showProfile)}
-            style={{ cursor: 'pointer' }}
-          >
-            R
-          </div>
-          
-          <AnimatePresence>
-            {showProfile && (
-              <motion.div 
-                className="dropdown-menu profile-dropdown"
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+          {!isAuthenticated ? (
+            <button 
+              className="btn btn-primary text-xs px-4 py-2 h-auto" 
+              onClick={() => navigate('/login')}
+            >
+              Sign In
+            </button>
+          ) : (
+            <>
+              <div 
+                className="header-avatar" 
+                onClick={() => setShowProfile(!showProfile)}
+                style={{ cursor: 'pointer' }}
               >
-                <div className="profile-info-box">
-                  <div className="header-avatar big">R</div>
-                  <div className="profile-meta">
-                    <p className="profile-name">Redwan Ahmmed</p>
-                    <p className="profile-email">redwan@example.com</p>
-                  </div>
-                </div>
-                <div className="dropdown-divider" />
-                <button className="dropdown-item" onClick={() => { setShowSettingsModal('profile'); setShowProfile(false); }}><User size={16} /> My Profile</button>
-                <button className="dropdown-item" onClick={() => { setShowSettingsModal('account'); setShowProfile(false); }}><Settings size={16} /> Account Settings</button>
-                {/* <button className="dropdown-item pro"><CheckCircle size={16} /> Subscription</button> */}
-                <div className="dropdown-divider" />
-                <button className="dropdown-item logout" onClick={() => { logout(); toast.success('Logged out successfully'); }}>
-                  <LogOut size={16} /> Log Out
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              
+              <AnimatePresence>
+                {showProfile && (
+                  <motion.div 
+                    className="dropdown-menu profile-dropdown"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  >
+                    <div className="profile-info-box">
+                      <div className="header-avatar big">{user?.name?.charAt(0) || 'U'}</div>
+                      <div className="profile-meta">
+                        <p className="profile-name">{user?.name || 'User'}</p>
+                        <p className="profile-email">{user?.email || 'user@example.com'}</p>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider" />
+                    <button className="dropdown-item" onClick={() => { setShowSettingsModal('profile'); setShowProfile(false); }}><User size={16} /> My Profile</button>
+                    <button className="dropdown-item" onClick={() => { setShowSettingsModal('account'); setShowProfile(false); }}><Settings size={16} /> Account Settings</button>
+                    <div className="dropdown-divider" />
+                    <button className="dropdown-item logout" onClick={() => { logout(); toast.success('Logged out successfully'); }}>
+                      <LogOut size={16} /> Log Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
         </div>
       </div>
 
       {/* Settings Modals */}
-      <Modal open={!!showSettingsModal} onClose={() => setShowSettingsModal(null)} title={showSettingsModal === 'profile' ? 'My Profile' : 'Account Settings'} width={500}>
+      <Modal 
+        open={!!showSettingsModal} 
+        onClose={() => {
+          setShowSettingsModal(null);
+          setPendingTheme(theme); // Reset pending on close
+        }} 
+        title={showSettingsModal === 'profile' ? 'My Profile' : 'Account Settings'} 
+        width={500}
+      >
         <div className="p-6">
           {showSettingsModal === 'profile' ? (
             <div className="space-y-4">
@@ -223,9 +281,9 @@ export default function Header({ onMenuClick }) {
               <div className="form-group">
                 <label className="form-label text-xs text-[var(--text-2)] uppercase tracking-wider font-semibold">Theme Preference</label>
                 <div className="flex bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg p-1">
-                  <button onClick={() => setTheme('light')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'light' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Sun size={14} /> Light</button>
-                  <button onClick={() => setTheme('dark')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Moon size={14} /> Dark</button>
-                  <button onClick={() => setTheme('system')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'system' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Monitor size={14} /> System</button>
+                  <button onClick={() => setPendingTheme('light')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${pendingTheme === 'light' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Sun size={14} /> Light</button>
+                  <button onClick={() => setPendingTheme('dark')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${pendingTheme === 'dark' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Moon size={14} /> Dark</button>
+                  <button onClick={() => setPendingTheme('system')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${pendingTheme === 'system' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Monitor size={14} /> System</button>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
@@ -256,6 +314,28 @@ export default function Header({ onMenuClick }) {
                 />
                 <p className="text-xs text-[var(--text-2)] mt-1">Transactions on or before this date cannot be added, edited, or deleted.</p>
               </div>
+
+              {/* Data Management (INFRA-02) */}
+              <div className="form-group mt-4">
+                <label className="form-label text-xs text-[var(--text-2)] uppercase tracking-wider font-semibold">Data Management</label>
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  <button onClick={handleExport} className="btn btn-outline text-xs py-2 h-auto flex items-center justify-center gap-2">
+                    Export Backup (JSON)
+                  </button>
+                  <div className="relative">
+                    <input 
+                      type="file" 
+                      accept=".json" 
+                      onChange={handleImport}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                    <button className="btn btn-outline text-xs py-2 h-auto w-full flex items-center justify-center gap-2">
+                      Import Backup
+                    </button>
+                  </div>
+                </div>
+                <p className="text-[10px] text-[var(--text-3)] mt-2 italic">Use this to move your data between devices or browsers.</p>
+              </div>
               <div className="mt-4 flex flex-row items-center justify-between p-3 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
                 <div>
                   <p className="text-white text-sm font-medium">Two-Factor Authentication</p>
@@ -271,8 +351,8 @@ export default function Header({ onMenuClick }) {
                 <button className="px-3 py-1.5 rounded-lg border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs font-medium">Delete Account</button>
               </div>
               <div className="form-actions mt-8 flex justify-end gap-3">
-                <button className="btn btn-ghost" onClick={() => setShowSettingsModal(null)}>Cancel</button>
-                <button className="btn btn-primary" onClick={() => { toast.success('Account settings saved'); setShowSettingsModal(null); }}>Save Settings</button>
+                <button className="btn btn-ghost" onClick={() => { setShowSettingsModal(null); setPendingTheme(theme); }}>Cancel</button>
+                <button className="btn btn-primary" onClick={() => { setTheme(pendingTheme); toast.success('Account settings saved'); setShowSettingsModal(null); }}>Save Settings</button>
               </div>
             </div>
           )}

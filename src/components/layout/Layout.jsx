@@ -9,6 +9,7 @@ export default function Layout() {
 
   return (
     <div className={`app-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <Waves 
         strokeColor="rgba(124, 58, 237, 0.1)" 
         backgroundColor="transparent" 
@@ -17,7 +18,7 @@ export default function Layout() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="main-content">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="page-content">
+        <main id="main-content" className="page-content">
           <Outlet />
         </main>
       </div>

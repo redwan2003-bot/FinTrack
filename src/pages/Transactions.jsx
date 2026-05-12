@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Search, Trash2, Pencil, ChevronDown, Lock, CheckCircle2 } from 'lucide-react';
 import { useTransactionStore } from '../store/useTransactionStore';
@@ -14,11 +15,18 @@ import { useTranslation } from '../lib/i18n';
 export default function Transactions() {
   const { t } = useTranslation();
   const { transactions, deleteTransaction } = useTransactionStore();
+  const [searchParams] = useSearchParams();
   const [showAdd, setShowAdd]     = useState(false);
   const [editing, setEditing]     = useState(null);
-  const [search, setSearch]       = useState('');
+  const [search, setSearch]       = useState(searchParams.get('q') || '');
   const [filterType, setFilterType] = useState('all');
   const [filterCat,  setFilterCat]  = useState('all');
+
+  // FIX UX-01: Update local search state if URL param changes
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null) setSearch(q);
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     return [...transactions]
@@ -32,8 +40,16 @@ export default function Transactions() {
   }, [transactions, search, filterType, filterCat]);
 
   const handleDelete = (id) => {
-    deleteTransaction(id);
-    toast.success('Transaction deleted');
+    try {
+      deleteTransaction(id);
+      toast.success('Transaction deleted');
+    } catch (err) {
+      if (err.message === 'RECONCILED_LOCKED') {
+        toast.error('Cannot void a reconciled transaction. Unlock it first.');
+      } else {
+        toast.error('Could not delete transaction.');
+      }
+    }
   };
 
   return (
@@ -113,8 +129,20 @@ export default function Transactions() {
                     </div>
                   ) : (
                     <>
-                      <button className="icon-btn" onClick={() => setEditing(t)}><Pencil size={14} /></button>
-                      <button className="icon-btn danger" onClick={() => handleDelete(t.id)}><Trash2 size={14} /></button>
+                      <button 
+                        className="icon-btn" 
+                        onClick={() => setEditing(t)}
+                        aria-label={`Edit ${t.description || t.merchantName}`}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button 
+                        className="icon-btn danger" 
+                        onClick={() => handleDelete(t.id)}
+                        aria-label={`Delete ${t.description || t.merchantName}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </>
                   )}
                 </div>

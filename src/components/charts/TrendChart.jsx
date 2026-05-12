@@ -99,6 +99,11 @@ export default function TrendChart() {
         backgroundColor: '#1a1a2e',
         padding: 12,
         cornerRadius: 10,
+        /**
+         * FIX #FIN-01: Standardized Currency Contract.
+         * Datasets store raw BDT float values (converted from cents).
+         * Tooltips convert back to cents for formatCurrency().
+         */
         callbacks: {
           label: (ctx) => ` ${ctx.dataset.label}: ${formatCurrency(ctx.raw * 100)}`,
         },

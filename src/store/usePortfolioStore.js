@@ -40,6 +40,10 @@ export const usePortfolioStore = create(
 
       getNetWorth: () => get().getTotalAssets() - get().getTotalLiabilities(),
     }),
-    { name: 'fintrack-portfolio-v1' }
+    { 
+      name: 'fintrack-portfolio-v1',
+      version: 1,
+      migrate: (persistedState) => persistedState,
+    }
   )
 );

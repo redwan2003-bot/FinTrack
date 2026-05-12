@@ -29,6 +29,10 @@ export const useBudgetStore = create(
       deleteBudget: (id) =>
         set((s) => ({ budgets: s.budgets.filter((b) => b.id !== id) })),
     }),
-    { name: 'fintrack-budgets-v1' }
+    { 
+      name: 'fintrack-budgets-v1',
+      version: 1,
+      migrate: (persistedState) => persistedState,
+    }
   )
 );
