@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Search, Trash2, Pencil, ChevronDown, Lock, CheckCircle2 } from 'lucide-react';
 import { useTransactionStore } from '../store/useTransactionStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { CATEGORIES } from '../utils/categories';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/dateUtils';
@@ -15,6 +16,7 @@ import { useTranslation } from '../lib/i18n';
 export default function Transactions() {
   const { t } = useTranslation();
   const { transactions, deleteTransaction } = useTransactionStore();
+  const { user } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [showAdd, setShowAdd]     = useState(false);
   const [editing, setEditing]     = useState(null);
@@ -41,7 +43,7 @@ export default function Transactions() {
 
   const handleDelete = (id) => {
     try {
-      deleteTransaction(id);
+      deleteTransaction(id, user?.id);
       toast.success('Transaction deleted');
     } catch (err) {
       if (err.message === 'RECONCILED_LOCKED') {

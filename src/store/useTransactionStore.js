@@ -2,19 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { format, subDays, parseISO, isBefore, isEqual } from 'date-fns';
+import { supabase } from '../lib/supabase';
 
 const d = (daysAgo) => format(subDays(new Date(), daysAgo), 'yyyy-MM-dd');
 const m = (monthsAgo, day) =>
   format(new Date(new Date().getFullYear(), new Date().getMonth() - monthsAgo, day), 'yyyy-MM-dd');
 
 const SEED = [
-  // Income
+  // ... (keeping SEED for guest view)
   { id: 's1',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(0,1)  },
   { id: 's2',  type: 'income',  amountCents: 150000, description: 'Freelance Project',    merchantName: 'Client Co.',         categoryId: 'income', date: m(0,10) },
   { id: 's3',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(1,1)  },
   { id: 's4',  type: 'income',  amountCents: 80000,  description: 'Side Project Payment', merchantName: 'Upwork',             categoryId: 'income', date: m(1,15) },
   { id: 's5',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(2,1)  },
-  // Food
   { id: 's6',  type: 'expense', amountCents: 4200,   description: 'Breakfast',            merchantName: 'Blue Bottle Coffee', categoryId: 'food',   date: d(1)   },
   { id: 's7',  type: 'expense', amountCents: 12800,  description: 'Team Lunch',           merchantName: 'Chipotle',           categoryId: 'food',   date: d(3)   },
   { id: 's8',  type: 'expense', amountCents: 6500,   description: 'Dinner',               merchantName: 'Pho 99',             categoryId: 'food',   date: d(5)   },
@@ -22,57 +22,40 @@ const SEED = [
   { id: 's10', type: 'expense', amountCents: 5500,   description: 'Cafe & Work',          merchantName: 'Starbucks',          categoryId: 'food',   date: d(9)   },
   { id: 's11', type: 'expense', amountCents: 14200,  description: 'Weekend Brunch',       merchantName: 'The Egg Shop',       categoryId: 'food',   date: d(11)  },
   { id: 's12', type: 'expense', amountCents: 9800,   description: 'Groceries',            merchantName: "Trader Joe's",       categoryId: 'food',   date: m(1,18) },
-  // Transport
   { id: 's13', type: 'expense', amountCents: 2400,   description: 'Uber to Office',       merchantName: 'Uber',               categoryId: 'transport', date: d(2)   },
   { id: 's14', type: 'expense', amountCents: 5800,   description: 'Gas',                  merchantName: 'Shell',              categoryId: 'transport', date: d(8)   },
   { id: 's15', type: 'expense', amountCents: 3200,   description: 'Metro Card Top-up',    merchantName: 'MTA',                categoryId: 'transport', date: d(14)  },
   { id: 's16', type: 'expense', amountCents: 1900,   description: 'Lyft Ride',            merchantName: 'Lyft',               categoryId: 'transport', date: m(1,22) },
-  // Bills
   { id: 's17', type: 'expense', amountCents: 150000, description: 'Rent',                 merchantName: 'Landlord',           categoryId: 'bills', date: m(0,1)  },
   { id: 's18', type: 'expense', amountCents: 9900,   description: 'Internet',             merchantName: 'Comcast',            categoryId: 'bills', date: m(0,5)  },
   { id: 's19', type: 'expense', amountCents: 7200,   description: 'Electricity',          merchantName: 'Con Edison',         categoryId: 'bills', date: m(0,8)  },
   { id: 's20', type: 'expense', amountCents: 4500,   description: 'Phone Bill',           merchantName: 'T-Mobile',           categoryId: 'bills', date: m(0,10) },
   { id: 's21', type: 'expense', amountCents: 150000, description: 'Rent',                 merchantName: 'Landlord',           categoryId: 'bills', date: m(1,1)  },
   { id: 's22', type: 'expense', amountCents: 9900,   description: 'Internet',             merchantName: 'Comcast',            categoryId: 'bills', date: m(1,5)  },
-  // Entertainment
   { id: 's23', type: 'expense', amountCents: 1599,   description: 'Netflix',              merchantName: 'Netflix',            categoryId: 'entertainment', date: m(0,3) },
   { id: 's24', type: 'expense', amountCents: 999,    description: 'Spotify',              merchantName: 'Spotify',            categoryId: 'entertainment', date: m(0,3) },
   { id: 's25', type: 'expense', amountCents: 3600,   description: 'Movie Night',          merchantName: 'AMC Theatres',       categoryId: 'entertainment', date: d(6)  },
   { id: 's26', type: 'expense', amountCents: 4999,   description: 'Gaming',               merchantName: 'Steam',              categoryId: 'entertainment', date: d(12) },
-  // Shopping
   { id: 's27', type: 'expense', amountCents: 15000,  description: 'New Headphones',       merchantName: 'Best Buy',           categoryId: 'shopping', date: d(4)   },
   { id: 's28', type: 'expense', amountCents: 8700,   description: 'Clothing',             merchantName: 'Zara',               categoryId: 'shopping', date: d(10)  },
   { id: 's29', type: 'expense', amountCents: 5400,   description: 'Amazon Order',         merchantName: 'Amazon',             categoryId: 'shopping', date: d(15)  },
   { id: 's30', type: 'expense', amountCents: 23000,  description: 'Laptop Stand',         merchantName: 'Apple Store',        categoryId: 'shopping', date: m(1,20) },
-  // Health
   { id: 's31', type: 'expense', amountCents: 4000,   description: 'Gym Membership',       merchantName: 'Planet Fitness',     categoryId: 'health', date: m(0,1)  },
   { id: 's32', type: 'expense', amountCents: 2500,   description: 'Pharmacy',             merchantName: 'CVS',                categoryId: 'health', date: d(13)  },
   { id: 's33', type: 'expense', amountCents: 15000,  description: 'Doctor Visit',         merchantName: 'City Medical',       categoryId: 'health', date: m(1,12) },
-  // Travel
   { id: 's34', type: 'expense', amountCents: 38000,  description: 'Flight Tickets',       merchantName: 'Delta Airlines',     categoryId: 'travel', date: m(1,8)  },
   { id: 's35', type: 'expense', amountCents: 22000,  description: 'Hotel Stay',           merchantName: 'Marriott',           categoryId: 'travel', date: m(1,8)  },
-  // Savings
   { id: 's36', type: 'expense', amountCents: 50000,  description: 'Emergency Fund',       merchantName: 'Savings Account',    categoryId: 'savings', date: m(0,2), status: 'reconciled' },
   { id: 's37', type: 'expense', amountCents: 50000,  description: 'Emergency Fund',       merchantName: 'Savings Account',    categoryId: 'savings', date: m(1,2), status: 'cleared' },
 ];
 
-/**
- * FIX #1 — Prevent infinite seed drift (BUG-01).
- * Instead of shifting dates on every load, we use a SEED_VERSION.
- * If the version changes, we can perform a one-time migration.
- */
 const SEED_VERSION = 'v2.1';
 const refreshSeedDates = (state) => {
   if (state.seedVersion === SEED_VERSION) return state.transactions;
-  
-  // First time load: shift seeds to be relative to today once
   const seedTxns = state.transactions.filter(t => t.id.startsWith('s'));
   if (seedTxns.length === 0) return state.transactions;
-
   const latestSeed = new Date(Math.max(...seedTxns.map(t => new Date(t.date))));
-  const today = new Date();
-  const diffDays = Math.floor((today - latestSeed) / (1000 * 60 * 60 * 24));
-
+  const diffDays = Math.floor((new Date() - latestSeed) / (1000 * 60 * 60 * 24));
   if (diffDays > 0) {
     const newTxns = state.transactions.map(t => {
       if (!t.id.startsWith('s')) return t;
@@ -83,17 +66,10 @@ const refreshSeedDates = (state) => {
     state.seedVersion = SEED_VERSION;
     return newTxns;
   }
-  
   state.seedVersion = SEED_VERSION;
   return state.transactions;
 };
 
-/**
- * FIX #4 — Transactions excluded from financial math.
- * 'voided'   = original transaction, preserved for audit trail, excluded from sums.
- * 'reversal' = GAAP reversing entry (negated amount), also excluded from sums.
- * This way the audit log shows the full history but balances are always correct.
- */
 const isActive = (t) => t.status !== 'voided' && t.status !== 'reversal';
 
 export const useTransactionStore = create(
@@ -101,102 +77,147 @@ export const useTransactionStore = create(
     (set, get) => ({
       transactions: SEED,
       lockDate: null,
+      isLoading: false,
+
+      fetchTransactions: async (userId) => {
+        if (!userId) return;
+        set({ isLoading: true });
+        const { data, error } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching transactions:', error);
+        } else {
+          // Map DB fields to store fields (amount_cents -> amountCents, etc.)
+          const mapped = data.map(t => ({
+            id: t.id,
+            date: t.date,
+            description: t.description,
+            amountCents: t.amount_cents,
+            categoryId: t.category_id,
+            type: t.type,
+            merchantName: t.merchant,
+            status: t.status,
+            reconciled: t.reconciled,
+            userId: t.user_id
+          }));
+          set({ transactions: mapped });
+        }
+        set({ isLoading: false });
+      },
+
       setLockDate: (date) => set({ lockDate: date }),
 
-      addTransaction: (data) =>
-        set((s) => {
-          if (s.lockDate && data.date) {
-            const txnDate = parseISO(data.date);
-            const lockDate = parseISO(s.lockDate);
-            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
-              console.warn(`Cannot add transaction on or before lock date: ${s.lockDate}`);
-              return s;
-            }
-          }
-          let debitAccount = 'unknown';
-          let creditAccount = 'unknown';
-          if (data.type === 'expense') {
-            debitAccount = `expense_${data.categoryId}`;
-            creditAccount = 'asset_cash';
-          } else if (data.type === 'income') {
-            debitAccount = 'asset_cash';
-            creditAccount = `revenue_${data.categoryId}`;
-          }
-          return {
-            transactions: [
-              { id: uuid(), createdAt: new Date().toISOString(), status: 'pending', debitAccount, creditAccount, ...data },
-              ...s.transactions,
-            ],
-          };
-        }),
+      addTransaction: async (data, userId) => {
+        const tempId = uuid();
+        const txnDate = parseISO(data.date);
+        
+        if (get().lockDate) {
+          const lockDate = parseISO(get().lockDate);
+          if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) return;
+        }
 
-      updateTransaction: (id, data) =>
-        set((s) => {
-          const txn = s.transactions.find((t) => t.id === id);
-          if (s.lockDate && txn) {
-            const txnDate = parseISO(txn.date);
-            const lockDate = parseISO(s.lockDate);
-            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
-              console.warn(`Cannot edit transaction on or before lock date: ${s.lockDate}`);
-              return s;
-            }
-          }
-          if (s.lockDate && data.date) {
-            const newDate = parseISO(data.date);
-            const lockDate = parseISO(s.lockDate);
-            if (isBefore(newDate, lockDate) || isEqual(newDate, lockDate)) {
-              console.warn(`Cannot move transaction to on or before lock date: ${s.lockDate}`);
-              return s;
-            }
-          }
-          return {
-            transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...data } : t)),
-          };
-        }),
+        // Optimistic UI
+        const newTxn = { 
+          id: tempId, 
+          createdAt: new Date().toISOString(), 
+          status: 'pending', 
+          ...data 
+        };
+        set(s => ({ transactions: [newTxn, ...s.transactions] }));
 
-      deleteTransaction: (id) =>
-        set((s) => {
-          const txn = s.transactions.find((t) => t.id === id);
-          if (!txn || txn.status === 'voided') return s;
-          if (s.lockDate && txn) {
-            const txnDate = parseISO(txn.date);
-            const lockDate = parseISO(s.lockDate);
-            if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
-              console.warn(`Cannot void transaction on or before lock date: ${s.lockDate}`);
-              return s;
-            }
+        if (userId) {
+          const { error } = await supabase.from('transactions').insert([{
+            id: tempId,
+            user_id: userId,
+            date: data.date,
+            description: data.description,
+            amount_cents: data.amountCents,
+            category_id: data.categoryId,
+            type: data.type,
+            merchant: data.merchantName,
+            status: 'active'
+          }]);
+          if (error) {
+            console.error('Sync failed:', error);
+            // Revert on error
+            set(s => ({ transactions: s.transactions.filter(t => t.id !== tempId) }));
           }
-          if (txn.status === 'reconciled') {
-            throw new Error('RECONCILED_LOCKED');
+        }
+      },
+
+      updateTransaction: async (id, data, userId) => {
+        const oldTxns = get().transactions;
+        // Optimistic UI
+        set(s => ({
+          transactions: s.transactions.map(t => t.id === id ? { ...t, ...data } : t)
+        }));
+
+        if (userId && !id.startsWith('s')) {
+          const { error } = await supabase.from('transactions').update({
+            date: data.date,
+            description: data.description,
+            amount_cents: data.amountCents,
+            category_id: data.categoryId,
+            type: data.type,
+            merchant: data.merchantName,
+            status: data.status,
+            reconciled: data.reconciled
+          }).eq('id', id);
+
+          if (error) {
+            console.error('Sync failed:', error);
+            set({ transactions: oldTxns });
           }
+        }
+      },
 
-          /**
-           * FIX #4 — GAAP-compliant voiding:
-           * 1. Mark original as 'voided' — preserves full amountCents for audit trail.
-           * 2. Post a true 'reversal' entry with negated amountCents.
-           * Both statuses are excluded from all balance calculations via isActive().
-           */
-          const reversingEntry = {
-            ...txn,
-            id: uuid(),
-            description: `[REVERSAL] ${txn.description || txn.merchantName || 'Untitled'}`,
-            amountCents: -Math.abs(txn.amountCents),
-            status: 'reversal',
-            reversalOf: txn.id,
-            createdAt: new Date().toISOString(),
-          };
+      deleteTransaction: async (id, userId) => {
+        const txn = get().transactions.find(t => t.id === id);
+        if (!txn || txn.status === 'voided' || txn.status === 'reconciled') return;
 
-          return {
-            transactions: [
-              reversingEntry,
-              ...s.transactions.map((t) =>
-                t.id === id
-                  ? { ...t, status: 'voided', voidedAt: new Date().toISOString() }
-                  : t
-              ),
-            ],
-          };
-        }),
+        const oldTxns = get().transactions;
+        
+        // GAAP Voiding (Local)
+        const reversingEntry = {
+          ...txn,
+          id: uuid(),
+          description: `[REVERSAL] ${txn.description || txn.merchantName}`,
+          amountCents: -Math.abs(txn.amountCents),
+          status: 'reversal',
+          createdAt: new Date().toISOString(),
+        };
+
+        set(s => ({
+          transactions: [
+            reversingEntry,
+            ...s.transactions.map(t => t.id === id ? { ...t, status: 'voided' } : t)
+          ]
+        }));
+
+        if (userId && !id.startsWith('s')) {
+          const { error: voidError } = await supabase.from('transactions').update({ status: 'voided' }).eq('id', id);
+          const { error: revError } = await supabase.from('transactions').insert([{
+            id: reversingEntry.id,
+            user_id: userId,
+            date: reversingEntry.date,
+            description: reversingEntry.description,
+            amount_cents: reversingEntry.amountCents,
+            category_id: reversingEntry.categoryId,
+            type: reversingEntry.type,
+            merchant: reversingEntry.merchantName,
+            status: 'reversal'
+          }]);
+
+          if (voidError || revError) {
+            console.error('Void sync failed');
+            set({ transactions: oldTxns });
+          }
+        }
+      },
 
       // ── Selectors (all exclude voided + reversal) ──────────────────────────
       getTotalIncome: () =>

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export default function LoginForm({ 
   email, 
@@ -121,6 +122,7 @@ export default function LoginForm({
                         whileHover={{ scale: 1.02, translateZ: "20px" }}
                         whileTap={{ scale: 0.98 }}
                         type="button" 
+                        onClick={() => useAuthStore.getState().loginWithGoogle()}
                         style={{
                             width: '100%',
                             display: 'flex',

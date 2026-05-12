@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { usePortfolioStore } from '../store/usePortfolioStore';
 import { useTransactionStore } from '../store/useTransactionStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency, toCents, fromCents } from '../utils/currency';
 import Modal from '../components/ui/Modal';
 import StatCard from '../components/ui/StatCard';
@@ -28,6 +29,7 @@ const CATEGORY_ICONS = {
 
 function PortfolioForm({ onClose, existing }) {
   const { addAccount, updateAccount } = usePortfolioStore();
+  const { user } = useAuthStore();
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: existing
@@ -40,10 +42,10 @@ function PortfolioForm({ onClose, existing }) {
   const onSubmit = (data) => {
     const payload = { ...data, balanceCents: toCents(data.balanceCents) };
     if (existing) {
-      updateAccount(existing.id, payload);
+      updateAccount(existing.id, payload, user?.id);
       toast.success('Account updated');
     } else {
-      addAccount(payload);
+      addAccount(payload, user?.id);
       toast.success('Account created');
     }
     onClose();
@@ -103,6 +105,7 @@ function PortfolioForm({ onClose, existing }) {
 export default function Portfolio() {
   const { accounts, deleteAccount, getTotalAssets, getTotalLiabilities, getNetWorth } = usePortfolioStore();
   const { getBalance } = useTransactionStore();
+  const { user } = useAuthStore();
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -113,7 +116,7 @@ export default function Portfolio() {
   const unifiedNetWorth = portfolioNetWorth + cashBalance;
 
   const handleDelete = (id) => {
-    deleteAccount(id);
+    deleteAccount(id, user?.id);
     toast.success('Account removed');
   };
 

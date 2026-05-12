@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Pencil, AlertTriangle } from 'lucide-react';
 import { useBudgetStore } from '../store/useBudgetStore';
 import { useTransactionStore } from '../store/useTransactionStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,6 +26,7 @@ const schema = z.object({
 
 function BudgetForm({ onClose, existing }) {
   const { addBudget, updateBudget } = useBudgetStore();
+  const { user } = useAuthStore();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: existing
@@ -34,8 +36,8 @@ function BudgetForm({ onClose, existing }) {
 
   const onSubmit = (data) => {
     const payload = { ...data, amountCents: toCents(data.amountCents) };
-    if (existing) { updateBudget(existing.id, payload); toast.success('Budget updated'); }
-    else           { addBudget(payload);                  toast.success('Budget created'); }
+    if (existing) { updateBudget(existing.id, payload, user?.id); toast.success('Budget updated'); }
+    else           { addBudget(payload, user?.id);                  toast.success('Budget created'); }
     onClose();
   };
 
@@ -190,6 +192,7 @@ function BudgetCard({ budget, spent, onEdit, onDelete }) {
 export default function Budgets() {
   const { budgets, deleteBudget } = useBudgetStore();
   const { transactions } = useTransactionStore();
+  const { user } = useAuthStore();
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -208,7 +211,7 @@ export default function Budgets() {
       .reduce((s, t) => s + t.amountCents, 0);
   };
 
-  const handleDelete = (id) => { deleteBudget(id); toast.success('Budget deleted'); };
+  const handleDelete = (id) => { deleteBudget(id, user?.id); toast.success('Budget deleted'); };
 
   const totalBudgeted = budgets.reduce((s, b) => s + b.amountCents, 0);
   const totalSpent    = budgets.reduce((s, b) => s + getSpent(b.categoryId, b.period), 0);

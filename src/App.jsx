@@ -29,6 +29,11 @@ const SafePage = ({ element }) => (
 
 export default function App() {
   const lang = useLanguageStore(state => state.lang);
+  const initAuth = useAuthStore(state => state.init);
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-lang', lang);

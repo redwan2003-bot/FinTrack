@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
 import { useTransactionStore } from '../../store/useTransactionStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { CATEGORIES } from '../../utils/categories';
 import { toCents } from '../../utils/currency';
 import { sanitizeText, sanitizeName } from '../../utils/security';
@@ -20,6 +21,7 @@ const schema = z.object({
 
 export default function TransactionForm({ onClose, existing }) {
   const { addTransaction, updateTransaction } = useTransactionStore();
+  const { user } = useAuthStore();
   const [activeType, setActiveType] = useState(existing?.type || 'expense');
 
   const { register, handleSubmit, setValue, getValues, formState: { errors, isSubmitting } } = useForm({
@@ -48,10 +50,10 @@ export default function TransactionForm({ onClose, existing }) {
       amountCents: toCents(data.amount) 
     };
     if (existing) {
-      updateTransaction(existing.id, payload);
+      updateTransaction(existing.id, payload, user?.id);
       toast.success('Transaction updated');
     } else {
-      addTransaction(payload);
+      addTransaction(payload, user?.id);
       toast.success('Transaction added');
     }
     onClose();
