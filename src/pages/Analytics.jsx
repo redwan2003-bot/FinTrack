@@ -195,11 +195,7 @@ export default function Reports() {
 
   return (
     <div className="page">
-      <div className="page-header flex justify-between items-center mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text-1)]">Financial Reports</h1>
-          <p className="text-[var(--text-2)] text-sm">Analyze your spending and tax strategy</p>
-        </div>
+      <div className="flex justify-end mb-6">
         {/* FIX #11: Tax year selector + export button */}
         <div className="flex items-center gap-4 flex-wrap">
           <div className="custom-select-box group">
@@ -230,6 +226,7 @@ export default function Reports() {
       {annualIncome > 0 && (
         <motion.div
           className="tax-liability-card"
+          style={{ borderColor: 'rgba(99, 102, 241, 0.2)' }}
           {...fadeUp(0)}
         >
           <div className="relative z-10">
@@ -374,10 +371,6 @@ export default function Reports() {
       </motion.div>
 
       <motion.div className="card mt-6" {...fadeUp(0.25)}>
-        <div className="card-header">
-          <h2 className="card-title">Balance Sheet</h2>
-          <span className="card-subtitle">Assets = Liabilities + Equity</span>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse" aria-label="Balance Sheet">
             <tbody>

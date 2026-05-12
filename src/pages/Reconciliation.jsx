@@ -79,14 +79,10 @@ export default function Reconciliation() {
 
   return (
     <div className="page">
-      <div className="page-header flex justify-between items-center mb-8 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text-1)]">Bank Reconciliation</h1>
-          <p className="text-[var(--text-2)] text-sm">Match bank statement lines to ensure GAAP compliance</p>
-        </div>
+      <div className="flex justify-end mb-8">
         {bankLines.length === 0 && (
           <button
-            className="btn btn-outline border-primary/30 text-primary hover:bg-primary/10 flex items-center gap-2"
+            className="btn btn-primary"
             onClick={handleUploadMock}
             aria-label="Load bank statement"
           >
@@ -102,15 +98,15 @@ export default function Reconciliation() {
         role="status"
         aria-live="polite"
       >
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isBalanced ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+        <div className="flex items-start gap-4">
+          <div className={`${isBalanced ? 'text-emerald-400' : 'text-red-400'} mt-1`}>
             {isBalanced ? <Scale size={24} /> : <AlertCircle size={24} />}
           </div>
           <div>
-            <h3 className="text-base font-bold text-[var(--text-1)]">
+            <h3 className="text-lg font-bold text-[var(--text-1)]">
               {isBalanced ? 'Ledger Balanced ✓' : 'Ledger Discrepancy Detected'}
             </h3>
-            <p className="text-xs text-[var(--text-3)] mt-1 max-w-md leading-relaxed font-medium">
+            <p className="text-sm text-[var(--text-3)] mt-1 max-w-md leading-relaxed font-medium">
               Every transaction has matching debit + credit entries. Double-entry integrity is verified and compliant.
             </p>
           </div>
@@ -151,7 +147,9 @@ export default function Reconciliation() {
         </motion.div>
       ) : (
         <>
-          <div className="flex items-center justify-between bg-[rgba(124,58,237,0.1)] border border-primary/20 rounded-xl p-4 mb-6 flex-wrap gap-3">
+          <div 
+            className="mb-6 flex items-center justify-between gap-6 p-4 rounded-xl bg-indigo-500/10 backdrop-blur-md"
+          >
             <div className="flex items-center gap-3">
               <AlertCircle className="text-primary flex-shrink-0" size={20} aria-hidden="true" />
               <div>

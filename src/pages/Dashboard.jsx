@@ -30,8 +30,10 @@ export default function Dashboard() {
     getBalance,
     // FIX #8: real month-over-month delta
     getMonthDelta,
+    getNetWorthDelta,
   } = useTransactionStore();
   const { getNetWorth } = usePortfolioStore();
+  const portfolioTotal = getNetWorth();
 
   const income   = getTotalIncome();
   const expenses = getTotalExpenses();
@@ -40,6 +42,7 @@ export default function Dashboard() {
   const incomeDelta  = getMonthDelta('income');
   const expenseDelta = getMonthDelta('expense');
   const balanceDelta = getMonthDelta('balance');
+  const nwDelta      = getNetWorthDelta(portfolioTotal);
 
   const recent = [...transactions]
     .filter(t => t.status !== 'voided' && t.status !== 'reversal')
@@ -64,10 +67,10 @@ export default function Dashboard() {
         <div className="stats-grid">
           <StatCard
             label="Net Worth"
-            value={formatCurrency(getNetWorth() + balance)}
+            value={formatCurrency(portfolioTotal + balance)}
             icon={TrendingUp}
             accent="#8b5cf6"
-            trend={balanceDelta}
+            trend={nwDelta}
             sub="Portfolio + Cash"
             delay={0}
           />

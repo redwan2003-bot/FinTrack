@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 export const useAuthStore = create(
   persist(
     (set) => ({
-      isAuthenticated: true, // Default to true so we don't lock the user out immediately without a login page
+      isAuthenticated: false, // Default to false to prevent unauthorized access
       user: {
         name: 'Redwan Ahmmed',
         email: 'redwan@example.com',

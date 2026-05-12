@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, Search, User, Settings, LogOut, CheckCircle, Menu, Globe } from 'lucide-react';
+import { Bell, Search, User, Settings, LogOut, CheckCircle, Menu, Globe, Sun, Moon, Monitor } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useTranslation } from '../../lib/i18n';
@@ -223,9 +223,9 @@ export default function Header({ onMenuClick }) {
               <div className="form-group">
                 <label className="form-label text-xs text-[var(--text-2)] uppercase tracking-wider font-semibold">Theme Preference</label>
                 <div className="flex bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg p-1">
-                  <button onClick={() => setTheme('light')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${theme === 'light' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}>☀️ Light</button>
-                  <button onClick={() => setTheme('dark')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${theme === 'dark' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}>🌙 Dark</button>
-                  <button onClick={() => setTheme('system')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${theme === 'system' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}>💻 System</button>
+                  <button onClick={() => setTheme('light')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'light' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Sun size={14} /> Light</button>
+                  <button onClick={() => setTheme('dark')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Moon size={14} /> Dark</button>
+                  <button onClick={() => setTheme('system')} className={`flex-1 py-1.5 text-xs rounded-md transition-colors flex items-center justify-center gap-2 ${theme === 'system' ? 'bg-primary text-white shadow-sm' : 'text-[var(--text-2)] hover:text-white'}`}><Monitor size={14} /> System</button>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">

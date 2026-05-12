@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout         from './components/layout/Layout';
 import Dashboard      from './pages/Dashboard';
@@ -19,14 +19,23 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+import { useLanguageStore } from './store/useLanguageStore';
+import { useEffect } from 'react';
+
 // Wraps any page in an ErrorBoundary so a crash is isolated to that page
 const SafePage = ({ element }) => (
   <ErrorBoundary>{element}</ErrorBoundary>
 );
 
 export default function App() {
+  const lang = useLanguageStore(state => state.lang);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-lang', lang);
+  }, [lang]);
+
   return (
-    <Router basename="/FinTrack">
+    <Router>
       <Toaster
         position="top-right"
         toastOptions={{

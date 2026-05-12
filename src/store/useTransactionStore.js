@@ -57,6 +57,32 @@ const SEED = [
 ];
 
 /**
+ * FIX #1 — Shift seed dates to stay "fresh" for returning users.
+ * If the latest seed transaction is more than 7 days old, we shift all seed
+ * transaction dates forward to be relative to today. This prevents "stale"
+ * seed data from breaking the month-over-month deltas.
+ */
+const refreshSeedDates = (txns) => {
+  const seedTxns = txns.filter(t => t.id.startsWith('s'));
+  if (seedTxns.length === 0) return txns;
+  
+  const latestSeed = new Date(Math.max(...seedTxns.map(t => new Date(t.date))));
+  const today = new Date();
+  const diffTime = today - latestSeed;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 7) {
+    return txns.map(t => {
+      if (!t.id.startsWith('s')) return t;
+      const d = new Date(t.date);
+      d.setDate(d.getDate() + diffDays);
+      return { ...t, date: format(d, 'yyyy-MM-dd') };
+    });
+  }
+  return txns;
+};
+
+/**
  * FIX #4 — Transactions excluded from financial math.
  * 'voided'   = original transaction, preserved for audit trail, excluded from sums.
  * 'reversal' = GAAP reversing entry (negated amount), also excluded from sums.
@@ -208,7 +234,39 @@ export const useTransactionStore = create(
         if (previous === 0) return current > 0 ? 100 : 0;
         return Number(((current - previous) / Math.abs(previous) * 100).toFixed(1));
       },
+      /**
+       * FIX #8 — Calculate Net Worth Delta.
+       * Reflects how much the total Net Worth (Portfolio + Cash) changed THIS MONTH.
+       */
+      getNetWorthDelta: (portfolioCents) => {
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+
+        const inMonth = (t, mo, yr) => {
+          if (!t.date || !isActive(t)) return false;
+          const dt = new Date(t.date);
+          return dt.getMonth() === mo && dt.getFullYear() === yr;
+        };
+
+        const currentMonthNet = get().transactions
+          .filter((t) => inMonth(t, curM, curY))
+          .reduce((s, t) => s + (t.type === 'income' ? t.amountCents : -t.amountCents), 0);
+
+        const currentNW = portfolioCents + get().getBalance();
+        const previousNW = currentNW - currentMonthNet;
+
+        if (previousNW === 0) return currentMonthNet > 0 ? 100 : 0;
+        return Number(((currentNW - previousNW) / Math.abs(previousNW) * 100).toFixed(1));
+      },
     }),
-    { name: 'fintrack-transactions-v2' }
+    { 
+      name: 'fintrack-transactions-v2',
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.transactions = refreshSeedDates(state.transactions);
+        }
+      }
+    }
   )
 );

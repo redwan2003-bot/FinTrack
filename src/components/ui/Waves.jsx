@@ -133,12 +133,6 @@ export function Waves({
 
             mouse.set = true
         }
-
-        // Update CSS variables
-        if (containerRef.current) {
-            containerRef.current.style.setProperty('--x', `${mouse.sx}px`)
-            containerRef.current.style.setProperty('--y', `${mouse.sy}px`)
-        }
     }
 
     // Move points - smoother wave motion

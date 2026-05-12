@@ -19,8 +19,8 @@ function MonthlyBar({ label, income, expense, maxVal }) {
   return (
     <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
       <div className="w-full flex items-end justify-center gap-1" style={{ height: 100 }}>
-        <div className="flex-1 rounded-t" style={{ height: `${incomeH}%`, background: '#22c55e', minHeight: 2 }} title={`Income: ${formatCurrency(income * 100)}`} />
-        <div className="flex-1 rounded-t" style={{ height: `${expenseH}%`, background: '#7c3aed', minHeight: 2 }} title={`Expense: ${formatCurrency(expense * 100)}`} />
+        <div className="flex-1 rounded-t" style={{ height: `${incomeH}%`, background: '#22c55e', minHeight: 2 }} title={`Income: ${formatCurrency(income)}`} />
+        <div className="flex-1 rounded-t" style={{ height: `${expenseH}%`, background: '#7c3aed', minHeight: 2 }} title={`Expense: ${formatCurrency(expense)}`} />
       </div>
       <span className="text-[10px] text-[var(--text-muted)] truncate w-full text-center">{label}</span>
     </div>
@@ -47,8 +47,8 @@ export default function Forecast() {
         const d = parseISO(t.date);
         return isValid(d) && d.getMonth() === mo && d.getFullYear() === yr;
       };
-      const income  = active.filter(t => t.type === 'income'  && inMo(t)).reduce((s, t) => s + fromCents(t.amountCents), 0);
-      const expense = active.filter(t => t.type === 'expense' && inMo(t)).reduce((s, t) => s + fromCents(t.amountCents), 0);
+      const income  = active.filter(t => t.type === 'income'  && inMo(t)).reduce((s, t) => s + t.amountCents, 0);
+      const expense = active.filter(t => t.type === 'expense' && inMo(t)).reduce((s, t) => s + t.amountCents, 0);
       return { label: format(ref, 'MMM'), income, expense };
     }).reverse();
   }, [active]);
@@ -73,7 +73,7 @@ export default function Forecast() {
   }, [avgIncome, avgExpense, mult]);
 
   // Cumulative net savings
-  let cum = fromCents(
+  let cum = (
     active.filter(t => t.type === 'income').reduce((s, t) => s + t.amountCents, 0) -
     active.filter(t => t.type === 'expense').reduce((s, t) => s + t.amountCents, 0)
   );
@@ -82,9 +82,9 @@ export default function Forecast() {
   const maxVal = Math.max(...last3.map(m => Math.max(m.income, m.expense)), ...projections.map(p => Math.max(p.income, p.expense)));
 
   // Savings goal calculator
-  const goalNum = parseFloat(goal) || 0;
-  const monthlyNet = avgIncome * mult - avgExpense;
-  const monthsToGoal = goalNum > 0 && monthlyNet > 0 ? Math.ceil(goalNum / monthlyNet) : null;
+  const goalNumCents = (parseFloat(goal) || 0) * 100;
+  const monthlyNet = Math.round(avgIncome * mult - avgExpense);
+  const monthsToGoal = goalNumCents > 0 && monthlyNet > 0 ? Math.ceil(goalNumCents / monthlyNet) : null;
   const goalDate = monthsToGoal ? format(addMonths(new Date(), monthsToGoal), 'MMMM yyyy') : null;
 
   const scenarioColors = { optimistic: '#22c55e', base: '#7c3aed', pessimistic: '#f59e0b' };
@@ -116,10 +116,10 @@ export default function Forecast() {
       {/* Summary stat tiles */}
       <div className="reports-summary mb-6">
         {[
-          { label: 'Avg Monthly Income',  value: formatCurrency(avgIncome * 100),             color: '#22c55e' },
-          { label: 'Avg Monthly Expense', value: formatCurrency(avgExpense * 100),             color: '#ef4444' },
-          { label: 'Projected Monthly Net', value: formatCurrency(monthlyNet * 100),           color: monthlyNet >= 0 ? '#7c3aed' : '#ef4444' },
-          { label: '6-Mo Projected Net Worth', value: formatCurrency(projections.at(-1)?.cumNet * 100 || 0), color: '#06b6d4' },
+          { label: 'Avg Monthly Income',  value: formatCurrency(Math.round(avgIncome)),             color: '#22c55e' },
+          { label: 'Avg Monthly Expense', value: formatCurrency(Math.round(avgExpense)),            color: '#ef4444' },
+          { label: 'Projected Monthly Net', value: formatCurrency(monthlyNet),                     color: monthlyNet >= 0 ? '#7c3aed' : '#ef4444' },
+          { label: '6-Mo Projected Net Worth', value: formatCurrency(projections.at(-1)?.cumNet || 0), color: '#06b6d4' },
         ].map((item, i) => (
           <motion.div key={item.label} className="report-tile" {...fadeUp(i * 0.07)}>
             <p className="report-tile-val" style={{ color: item.color }}>{item.value}</p>
@@ -181,10 +181,10 @@ export default function Forecast() {
               {projections.map((p, i) => (
                 <tr key={i} className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)]">
                   <td className="py-2.5 px-3 font-medium text-[var(--text-1)]">{p.label}</td>
-                  <td className="py-2.5 px-3 text-emerald-400">{formatCurrency(p.income * 100)}</td>
-                  <td className="py-2.5 px-3 text-red-400">{formatCurrency(p.expense * 100)}</td>
-                  <td className={`py-2.5 px-3 font-semibold ${p.net >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatCurrency(p.net * 100)}</td>
-                  <td className="py-2.5 px-3 text-purple-400 font-semibold">{formatCurrency(p.cumNet * 100)}</td>
+                  <td className="py-2.5 px-3 text-emerald-400">{formatCurrency(Math.round(p.income))}</td>
+                  <td className="py-2.5 px-3 text-red-400">{formatCurrency(Math.round(p.expense))}</td>
+                  <td className={`py-2.5 px-3 font-semibold ${p.net >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatCurrency(Math.round(p.net))}</td>
+                  <td className="py-2.5 px-3 text-purple-400 font-semibold">{formatCurrency(Math.round(p.cumNet))}</td>
                 </tr>
               ))}
             </tbody>
@@ -212,7 +212,7 @@ export default function Forecast() {
               />
             </div>
           </div>
-          {goalNum > 0 && (
+          {goalNumCents > 0 && (
             <div
               className="flex-1 p-4 rounded-xl border"
               style={{
@@ -224,7 +224,7 @@ export default function Forecast() {
             >
               {monthlyNet > 0 && monthsToGoal ? (
                 <>
-                  <p className="text-xs text-[var(--text-2)]">At {formatCurrency(monthlyNet * 100)}/month net savings</p>
+                  <p className="text-xs text-[var(--text-2)]">At {formatCurrency(monthlyNet)}/month net savings</p>
                   <p className="text-lg font-bold text-emerald-400 mt-1">
                     Reach goal in <span className="text-white">{monthsToGoal} months</span>
                   </p>

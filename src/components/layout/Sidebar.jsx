@@ -20,50 +20,7 @@ const NAV = [
 ];
 
 
-import { CreativePricing } from '../ui/creative-pricing';
 
-const PRICING_TIERS = [
-  {
-    name_key: "basic_plan",
-    icon: <Wallet className="w-6 h-6" />,
-    price: 0,
-    desc_key: "basic_desc",
-    color: "emerald",
-    features_keys: [
-      "feat_basic_tracking",
-      "feat_budget_cats",
-      "feat_standard_reports",
-      "feat_local_storage",
-    ],
-  },
-  {
-    name_key: "pro_plan",
-    icon: <TrendingUp className="w-6 h-6" />,
-    price: 499,
-    desc_key: "pro_desc",
-    color: "blue",
-    features_keys: [
-      "feat_unlimited_txn",
-      "feat_ai_insights",
-      "feat_custom_cats",
-      "feat_cloud_backup",
-    ],
-    popular: true,
-  },
-  {
-    name_key: "ultimate_plan",
-    icon: <Sparkles className="w-6 h-6" />,
-    price: 1111,
-    desc_key: "ultimate_desc",
-    color: "purple",
-    features_keys: [
-      "feat_all_pro",
-      "feat_priority_support",
-      "feat_export_pdf",
-      "feat_family_accounts",
-    ],
-  },
-];
 
 export default function Sidebar({ isOpen, onClose }) {
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -74,12 +31,7 @@ export default function Sidebar({ isOpen, onClose }) {
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : 'U';
 
-  const TRANSLATED_TIERS = PRICING_TIERS.map(tier => ({
-    ...tier,
-    name: t(tier.name_key),
-    description: t(tier.desc_key),
-    features: tier.features_keys.map(f => t(f))
-  }));
+
 
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`} aria-label="Main navigation">
