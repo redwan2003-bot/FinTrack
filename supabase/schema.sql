@@ -53,3 +53,8 @@ USING (auth.uid() = user_id);
 CREATE POLICY "Users can only delete their own portfolio accounts" 
 ON portfolio_accounts FOR DELETE 
 USING (auth.uid() = user_id);
+
+-- 4. Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_budgets_user_id ON budgets(user_id);
+CREATE INDEX IF NOT EXISTS idx_portfolio_accounts_user_id ON portfolio_accounts(user_id);
