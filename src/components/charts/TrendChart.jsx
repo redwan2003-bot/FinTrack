@@ -126,7 +126,7 @@ export default function TrendChart() {
   };
 
   return (
-    <div className="chart-wrap" style={{ height: 260 }}>
+    <div className="chart-wrap" style={{ height: 260 }} role="img" aria-label="Line chart showing income vs expenses over the last 6 months">
       <Line data={chartData} options={options} />
     </div>
   );

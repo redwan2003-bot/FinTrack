@@ -15,6 +15,7 @@ dist-ssr
 .env.*
 !.env.example
 .agents/
+.agentic/plans/
 
 # Editor directories and files
 .vscode/*

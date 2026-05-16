@@ -41,6 +41,26 @@ function BudgetForm({ onClose, existing }) {
     onClose();
   };
 
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="w-16 h-16 bg-[rgba(255,255,255,0.05)] rounded-full flex items-center justify-center mb-4 text-[var(--text-muted)]">
+          <AlertTriangle size={32} />
+        </div>
+        <h3 className="text-lg font-semibold text-[var(--text-1)] mb-2">Authentication Required</h3>
+        <p className="text-[var(--text-2)] text-sm mb-6 max-w-[280px]">
+          Please sign in to your account to create and manage budgets.
+        </p>
+        <button 
+          className="btn btn-primary w-full" 
+          onClick={() => window.location.href = '#/login'}
+        >
+          Sign In Now
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form className="txn-form" onSubmit={handleSubmit(onSubmit)}>
       <div className="form-group">

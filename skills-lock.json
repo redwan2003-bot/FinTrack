@@ -1,6 +1,78 @@
 {
   "version": 1,
   "skills": {
+    "add-tests": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/add-tests/SKILL.md",
+      "computedHash": "571fb2f468993c2e8cbb1aeda6bca30a6c4b576049c57d233ca11ad555fc1648"
+    },
+    "code-review": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/code-review/SKILL.md",
+      "computedHash": "adea4711e722c5c010d436a1f1492f78eef3dea7748225a05896cd5f2ac78017"
+    },
+    "compose-agents-md": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/compose-agents-md/SKILL.md",
+      "computedHash": "83c201c6b80789dd76ee0dd45e6bc1e9446afb6f50e8627d5895dc39be07cf7b"
+    },
+    "configure-mcp": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/configure-mcp/SKILL.md",
+      "computedHash": "c935ff6279bedb20933458eafe29c5f88bac2825c97000f4f9fac9512c48314f"
+    },
+    "create-terraform-module": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/create-terraform-module/SKILL.md",
+      "computedHash": "8b99aeaae5d905d88d8c99fcc47f8b21e0d56bf6c55a358d111bf42313b757ed"
+    },
+    "create-terraform-tests": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/create-terraform-tests/SKILL.md",
+      "computedHash": "370499a4b16442a0962b25c455702d928a7789073c188458d387fa70517754c7"
+    },
+    "ddd-aggregate-modeling": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/ddd-aggregate-modeling/SKILL.md",
+      "computedHash": "f8b12d168e5820e9aad72c80cbb5ed61bc2bfc20e1c14f7b54f59e8986b9e8df"
+    },
+    "deploy-config": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/deploy-config/SKILL.md",
+      "computedHash": "6b6e4fbb4e94b040c2a3584addc2849b20846184bd5badf7faeecdf5ef42523f"
+    },
+    "design-aws-terraform-iac": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/design-aws-terraform-iac/SKILL.md",
+      "computedHash": "4abff2949d915b44b3de4cd0240b2e370b918dc5e8f24c1f6167dbd4e17b0ee5"
+    },
+    "diagram-design": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/diagram-design/SKILL.md",
+      "computedHash": "28f5a36608129225f4564fda7caf14c3f4acbe84d3f5c4ec7ad29dc12f985544"
+    },
+    "docker-compose-local-setup": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/docker-compose-local-setup/SKILL.md",
+      "computedHash": "79936c274d3b592910bf81b033b70ca3705472c44864ea068e157da1021d2be1"
+    },
+    "fix-bug": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/fix-bug/SKILL.md",
+      "computedHash": "b4878623ea49c5a7930e62abfcacd5798aaa52a76506d23296ae63807b1c8122"
+    },
     "framer-motion-gestures": {
       "source": "C-Jeril/framer-motion-skills",
       "sourceType": "github",
@@ -31,6 +103,144 @@
       "skillPath": "skills/framer-motion-variants/SKILL.md",
       "computedHash": "a186d6cad8c75ff61efa8d70cf3ba2246bfbf62bba157b433d13c516557f81ac"
     },
+    "git-flow-pr": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/git-flow-pr/SKILL.md",
+      "computedHash": "1ca9d4ec74d6e1f29a1dab9ee9756c5259b21f00f99c82975b929be9b162dcec"
+    },
+    "git-worktree-workspaces": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/git-worktree-workspaces/SKILL.md",
+      "computedHash": "efc1dcace80751acd00411d6cbdc6fa0c305167c8ca42c567ca1f8384617d93c"
+    },
+    "github-actions-workflow": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/github-actions-workflow/SKILL.md",
+      "computedHash": "1df9559ac63e30d029e6d16aa892a2e1bc12bb3c7935a3d3f6f0b0cc295c33a4"
+    },
+    "github-issue-planning": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/github-issue-planning/SKILL.md",
+      "computedHash": "52e9e6156391971ee4d6ff791988034fbd9d6f53261c5624894dd92460327878"
+    },
+    "golang-manual-di": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/golang-manual-di/SKILL.md",
+      "computedHash": "649adc1143618c0a7bf17dbad9a1998609725394684abb2f6bb506728039d001"
+    },
+    "health-check-endpoints": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/health-check-endpoints/SKILL.md",
+      "computedHash": "eebd063be8ab280aeee22e1c5507e6874173b7639f071d60962b351dc224f57f"
+    },
+    "internationalization-i18n": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/internationalization-i18n/SKILL.md",
+      "computedHash": "67a602a3dc8e32c40d2d92ad7a0c85b579526f6d78242c95f4416352b0544065"
+    },
+    "json-to-toon": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/data/json-to-toon/SKILL.md",
+      "computedHash": "d3d61242fe9a42acef8a6adb4b5fe719e8b93ae069ba1e70d3c9334c1ef70c45"
+    },
+    "microservices-architecture": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/microservices-architecture/SKILL.md",
+      "computedHash": "b234a5dd0d2e3557a9e49864f0b163cee257d57212aa8fb220af9e21c5769866"
+    },
+    "monorepo-management": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/monorepo-management/SKILL.md",
+      "computedHash": "1fe476bf75e0d28a7ea0e0d1acd808f9c9dd8f83b842acd04ad33f3426168c18"
+    },
+    "new-gh-issue-orchestration": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/new-gh-issue-orchestration/SKILL.md",
+      "computedHash": "7bd5df426306d3a03922494c4cd1798e520bdeccef12b260607f50fd56bd6f23"
+    },
+    "next-application-structure": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/next-application-structure/SKILL.md",
+      "computedHash": "075393678d73e5d33c3807c8ac579110d16a7a587f1a5578ebc5c9c184792a55"
+    },
+    "nosql-database-design": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/nosql-database-design/SKILL.md",
+      "computedHash": "4467ab6ff317e85b0b0a098f9047fa2dd7c9c0486ba6f2f53d5811c01a8f9608"
+    },
+    "persist-plan": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/persist-plan/SKILL.md",
+      "computedHash": "9f76996e271c368c8400306a2f9d2162fc2d1839f50b6f1045f934bc8b6e3474"
+    },
+    "pull-request-automation": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/pull-request-automation/SKILL.md",
+      "computedHash": "c87087655020b2d42d330c7fed576fb65ceb2aa1de95f7857ecd25c982c70587"
+    },
+    "react-application-structure": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/react-application-structure/SKILL.md",
+      "computedHash": "8f6aa6c1557eaff2f79c796b4ff8148792c7783be0a50a62567f5870623f7b0b"
+    },
+    "react-component-design": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/react-component-design/SKILL.md",
+      "computedHash": "0c85cbbf1582d080cab7529a0a21b630538ff08d4af9631e0128ddbbe97dac8f"
+    },
+    "react-component-testing": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/react-component-testing/SKILL.md",
+      "computedHash": "b65147eb98879766403231f02e752f20bbe3d061a49bf67024fd7d045e1ea844"
+    },
+    "refactor": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/refactor/SKILL.md",
+      "computedHash": "0507bb394381e1927a198328b4b58f1b91beb1ed278fc9bba63cc9c6712b87d1"
+    },
+    "relational-database-design": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/data/relational-database-design/SKILL.md",
+      "computedHash": "e206e8493465fb2759bd82d945527719c121ae826a7e286bca6191a8138e6975"
+    },
+    "serverless-architecture": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/serverless-architecture/SKILL.md",
+      "computedHash": "9f6270b099160ba2c9369f78213c89758f9a19f636461e969b4a24d6349b8b89"
+    },
+    "sql-query-optimization": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/sql-query-optimization/SKILL.md",
+      "computedHash": "83abbe6631b0803315a3e9f30ff8c81e927c503a09bf7c490684ca98f4fa7739"
+    },
+    "static-code-analysis": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/development/static-code-analysis/SKILL.md",
+      "computedHash": "1a8149ebe23abb41dbf91197b414d09947b27bed0d1dfd4510e5a6c3d238b9ab"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
@@ -42,6 +252,90 @@
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "8e41c7417894e6f394614ee7ca3ee5322b1e58d890255d441f42dea98732597f"
+    },
+    "sync-confluence": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/documentation/sync-confluence/SKILL.md",
+      "computedHash": "500e669231d53472adecb1c02d41503f31a516d1fe4fde14ee5e901e3450c50a"
+    },
+    "technical-roadmap-planning": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/technical-roadmap-planning/SKILL.md",
+      "computedHash": "719a056031756edfcfe06e0f5011954c224ed7b0dbfe479e0c1c558274e28ba5"
+    },
+    "terraform-infrastructure": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/terraform-infrastructure/SKILL.md",
+      "computedHash": "f1c5ba1344851ae5e33d3fab27800e98ae9d3aa97d3a57d04b9221b7418e02ce"
+    },
+    "use-aws-mini-stack-emulator": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/use-aws-mini-stack-emulator/SKILL.md",
+      "computedHash": "126e409dd2d6e1cd89d3e39d0ace11b9af9973066cbf44c7fabe8e29ff2adc59"
+    },
+    "vue-application-structure": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/vue-application-structure/SKILL.md",
+      "computedHash": "9790590ad68ce953198ea3321e74a36cf123bf54f4e95fca77795c07baa8a762"
+    },
+    "vue-component-design": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/vue-component-design/SKILL.md",
+      "computedHash": "a807f22816f9e6eee7071ed54062310f141da57832083dddcadba20b836192d6"
+    },
+    "vue-component-testing": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/vue-component-testing/SKILL.md",
+      "computedHash": "cf9f4639c58b52fddcb1dae6619e71734733cfc21cc64fa66cb3b289a282321a"
+    },
+    "webhook-development": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/backend/webhook-development/SKILL.md",
+      "computedHash": "b622d51e7625bbfbdd191ff830c823ef7a4541e1a8c618029c18d70fc66ce865"
+    },
+    "wireframe-prototyping": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/ui/wireframe-prototyping/SKILL.md",
+      "computedHash": "6cb57f0364575e62c4841f0ddb7d5f672d6a085471a593fdb919cc30d6e6e745"
+    },
+    "write-adr": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/documentation/write-adr/SKILL.md",
+      "computedHash": "92030fb391082be5effc4dc05be9f802129aa5a8475bfbfacce1f98506c1ee8b"
+    },
+    "write-changelog": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/documentation/write-changelog/SKILL.md",
+      "computedHash": "295be612a2529fbaa5c789f3f838f8e8488a06a218486ba7548dbb496cfc0a70"
+    },
+    "write-dockerfile": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/devops/write-dockerfile/SKILL.md",
+      "computedHash": "d2c40b8d9bf68e903be5745f22820d8b7c7cfad634802271026ffecbba6089aa"
+    },
+    "write-plan": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/agentic/write-plan/SKILL.md",
+      "computedHash": "e5f23b37e6e637aa4f9c9cd626a311156de00052a4327e3c02d33686a5042994"
+    },
+    "write-readme": {
+      "source": "soulcodex/agentic",
+      "sourceType": "github",
+      "skillPath": "skills/documentation/write-readme/SKILL.md",
+      "computedHash": "3be0e9cc6541cf6ee5bd53569c17b1f402b6a23ca6156382e3f3373aa5db0212"
     }
   }
 }

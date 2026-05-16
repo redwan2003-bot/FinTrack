@@ -70,7 +70,7 @@ export default function SpendingPieChart() {
   };
 
   return (
-    <div className="chart-wrap" style={{ height: 260 }}>
+    <div className="chart-wrap" style={{ height: 260 }} role="img" aria-label="Donut chart showing spending by category">
       <Doughnut data={data} options={options} />
     </div>
   );

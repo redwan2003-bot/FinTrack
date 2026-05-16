@@ -3,13 +3,10 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
 import { supabase } from '../lib/supabase';
+import toast from 'react-hot-toast';
 
-const SEED_PORTFOLIO = [
-  // ... (keeping SEED for guest view)
-  { id: 'p1', name: 'Vanguard S&P 500', type: 'asset', category: 'investment', balanceCents: 1500000 },
-  { id: 'p2', name: 'Emergency Savings', type: 'asset', category: 'cash', balanceCents: 500000 },
-  { id: 'p3', name: 'Car Loan', type: 'liability', category: 'debt', balanceCents: 850000 },
-];
+const SEED_PORTFOLIO = [];
+
 
 export const usePortfolioStore = create(
   persist(
@@ -37,33 +34,37 @@ export const usePortfolioStore = create(
       },
 
       addAccount: async (data, userId) => {
+        if (!userId) {
+          toast.error('Please login to add accounts');
+          return;
+        }
         const tempId = uuid();
         const newAcc = { id: tempId, ...data };
         set(s => ({ accounts: [...s.accounts, newAcc] }));
 
-        if (userId) {
-          const { error } = await supabase.from('portfolio_accounts').insert([{
-            id: tempId,
-            user_id: userId,
-            name: data.name,
-            type: data.type,
-            category: data.category,
-            balance_cents: data.balanceCents
-          }]);
-          if (error) {
-            console.error('Sync failed:', error);
-            set(s => ({ accounts: s.accounts.filter(a => a.id !== tempId) }));
-          }
+        const { error } = await supabase.from('portfolio_accounts').insert([{
+          id: tempId,
+          user_id: userId,
+          name: data.name,
+          type: data.type,
+          category: data.category,
+          balance_cents: data.balanceCents
+        }]);
+        if (error) {
+          console.error('Sync failed:', error);
+          toast.error('Sync failed');
+          set(s => ({ accounts: s.accounts.filter(a => a.id !== tempId) }));
         }
       },
 
       updateAccount: async (id, data, userId) => {
+        if (!userId) return;
         const oldAccs = get().accounts;
         set(s => ({
           accounts: s.accounts.map(a => a.id === id ? { ...a, ...data } : a)
         }));
 
-        if (userId && !id.startsWith('p')) {
+        if (!id.startsWith('p')) {
           const { error } = await supabase.from('portfolio_accounts').update({
             name: data.name,
             type: data.type,
@@ -74,19 +75,22 @@ export const usePortfolioStore = create(
 
           if (error) {
             console.error('Sync failed:', error);
+            toast.error('Sync failed');
             set({ accounts: oldAccs });
           }
         }
       },
 
       deleteAccount: async (id, userId) => {
+        if (!userId) return;
         const oldAccs = get().accounts;
         set(s => ({ accounts: s.accounts.filter(a => a.id !== id) }));
 
-        if (userId && !id.startsWith('p')) {
+        if (!id.startsWith('p')) {
           const { error } = await supabase.from('portfolio_accounts').delete().eq('id', id);
           if (error) {
             console.error('Sync failed:', error);
+            toast.error('Sync failed');
             set({ accounts: oldAccs });
           }
         }
@@ -105,8 +109,8 @@ export const usePortfolioStore = create(
       getNetWorth: () => get().getTotalAssets() - get().getTotalLiabilities(),
     }),
     { 
-      name: 'fintrack-portfolio-v1',
-      version: 1,
+      name: 'fintrack-portfolio-v2',
+      version: 2,
       migrate: (persistedState) => persistedState,
     }
   )

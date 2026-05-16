@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import LoginForm from '../components/ui/login-form';
@@ -26,8 +26,16 @@ export default function Auth() {
   const [lockedUntil, setLockedUntil] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const login = useAuthStore((state) => state.login);
+  const signUp = useAuthStore((state) => state.signUp);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const strength = getPasswordStrength(password);
   const isLocked = lockedUntil && Date.now() < lockedUntil;
@@ -65,21 +73,17 @@ export default function Auth() {
 
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       if (isLogin) {
-        const validDemoEmail = email.includes('@') && email.length > 3;
-        const validDemoPassword = password.length >= 1;
-        if (!validDemoEmail || !validDemoPassword) {
-          throw new Error('Invalid credentials');
-        }
+        await login(email, password);
+        toast.success('Welcome back!');
+      } else {
+        await signUp(email, password);
+        toast.success('Check your email to confirm sign-up!');
       }
-
-      login(email, password);
-      toast.success(isLogin ? 'Welcome back!' : 'Account created!');
       navigate('/dashboard');
       setAttempts(0);
-    } catch {
+    } catch (error) {
+      console.error('Auth error:', error);
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 3) {
@@ -88,7 +92,7 @@ export default function Auth() {
         toast.error('Security Lockout: 15 seconds.');
         setTimeout(() => setLockedUntil(null), 15000);
       } else {
-        toast.error(`Auth failed. ${3 - newAttempts} attempts left.`);
+        toast.error(error.message || 'Authentication failed');
       }
     } finally {
       setIsLoading(false);

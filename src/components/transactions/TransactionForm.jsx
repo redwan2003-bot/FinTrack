@@ -59,6 +59,26 @@ export default function TransactionForm({ onClose, existing }) {
     onClose();
   };
 
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="w-16 h-16 bg-[rgba(255,255,255,0.05)] rounded-full flex items-center justify-center mb-4 text-[var(--text-muted)]">
+          <User size={32} />
+        </div>
+        <h3 className="text-lg font-semibold text-[var(--text-1)] mb-2">Authentication Required</h3>
+        <p className="text-[var(--text-2)] text-sm mb-6 max-w-[280px]">
+          Please sign in to your account to add or manage transactions.
+        </p>
+        <button 
+          className="btn btn-primary w-full" 
+          onClick={() => window.location.href = '#/login'}
+        >
+          Sign In Now
+        </button>
+      </div>
+    );
+  }
+
   const setType = (t) => { setActiveType(t); setValue('type', t); };
 
   const cats = activeType === 'income'
@@ -68,49 +88,93 @@ export default function TransactionForm({ onClose, existing }) {
   return (
     <form className="txn-form" onSubmit={handleSubmit(onSubmit)}>
       {/* Type toggle */}
-      <div className="type-toggle">
-        <button type="button" className={`toggle-btn ${activeType === 'expense' ? 'active-expense' : ''}`} onClick={() => setType('expense')}>Expense</button>
-        <button type="button" className={`toggle-btn ${activeType === 'income'  ? 'active-income'  : ''}`} onClick={() => setType('income')} >Income</button>
-      </div>
+      <fieldset className="type-toggle" role="radiogroup" aria-label="Transaction type">
+        <button 
+          type="button" 
+          className={`toggle-btn ${activeType === 'expense' ? 'active-expense' : ''}`} 
+          onClick={() => setType('expense')}
+          aria-pressed={activeType === 'expense'}
+        >
+          Expense
+        </button>
+        <button 
+          type="button" 
+          className={`toggle-btn ${activeType === 'income'  ? 'active-income'  : ''}`} 
+          onClick={() => setType('income')}
+          aria-pressed={activeType === 'income'}
+        >
+          Income
+        </button>
+      </fieldset>
       <input type="hidden" {...register('type')} value={activeType} />
 
       {/* Amount */}
       <div className="form-group">
-        <label className="form-label">Amount (BDT)</label>
+        <label className="form-label" htmlFor="txn-amount">Amount (BDT)</label>
         <div className="amount-input-wrap">
-          <span className="currency-symbol">৳</span>
-          <input className={`form-input amount-input ${errors.amount ? 'error' : ''}`} type="number" step="0.01" placeholder="0.00" {...register('amount')} />
+          <span className="currency-symbol" aria-hidden="true">৳</span>
+          <input 
+            id="txn-amount"
+            className={`form-input amount-input ${errors.amount ? 'error' : ''}`} 
+            type="number" 
+            step="0.01" 
+            placeholder="0.00" 
+            {...register('amount')} 
+            aria-invalid={!!errors.amount}
+          />
         </div>
-        {errors.amount && <p className="form-error">{errors.amount.message}</p>}
+        {errors.amount && <p className="form-error" role="alert">{errors.amount.message}</p>}
       </div>
 
       {/* Description */}
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <input className={`form-input ${errors.description ? 'error' : ''}`} placeholder="e.g. Grocery run" {...register('description')} />
-        {errors.description && <p className="form-error">{errors.description.message}</p>}
+        <label className="form-label" htmlFor="txn-desc">Description</label>
+        <input 
+          id="txn-desc"
+          className={`form-input ${errors.description ? 'error' : ''}`} 
+          placeholder="e.g. Grocery run" 
+          {...register('description')} 
+          aria-invalid={!!errors.description}
+        />
+        {errors.description && <p className="form-error" role="alert">{errors.description.message}</p>}
       </div>
 
       {/* Merchant */}
       <div className="form-group">
-        <label className="form-label">Merchant <span style={{color:'var(--text-muted)'}}>optional</span></label>
-        <input className="form-input" placeholder="e.g. Whole Foods" {...register('merchantName')} />
+        <label className="form-label" htmlFor="txn-merchant">Merchant <span style={{color:'var(--text-muted)'}}>optional</span></label>
+        <input 
+          id="txn-merchant"
+          className="form-input" 
+          placeholder="e.g. Whole Foods" 
+          {...register('merchantName')} 
+        />
       </div>
 
       {/* Category */}
       <div className="form-group">
-        <label className="form-label">Category</label>
-        <select className={`form-input ${errors.categoryId ? 'error' : ''}`} {...register('categoryId')}>
+        <label className="form-label" htmlFor="txn-cat">Category</label>
+        <select 
+          id="txn-cat"
+          className={`form-input ${errors.categoryId ? 'error' : ''}`} 
+          {...register('categoryId')}
+          aria-invalid={!!errors.categoryId}
+        >
           {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        {errors.categoryId && <p className="form-error">{errors.categoryId.message}</p>}
+        {errors.categoryId && <p className="form-error" role="alert">{errors.categoryId.message}</p>}
       </div>
 
       {/* Date */}
       <div className="form-group">
-        <label className="form-label">Date</label>
-        <input type="date" className={`form-input ${errors.date ? 'error' : ''}`} {...register('date')} />
-        {errors.date && <p className="form-error">{errors.date.message}</p>}
+        <label className="form-label" htmlFor="txn-date">Date</label>
+        <input 
+          id="txn-date"
+          type="date" 
+          className={`form-input ${errors.date ? 'error' : ''}`} 
+          {...register('date')} 
+          aria-invalid={!!errors.date}
+        />
+        {errors.date && <p className="form-error" role="alert">{errors.date.message}</p>}
       </div>
 
       {/* Submit */}

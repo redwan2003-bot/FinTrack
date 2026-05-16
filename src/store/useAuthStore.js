@@ -30,6 +30,18 @@ export const useAuthStore = create(
         });
       },
 
+      login: async (email, password) => {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        set({ isAuthenticated: true, user: data.user });
+      },
+
+      signUp: async (email, password) => {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        set({ isAuthenticated: true, user: data.user });
+      },
+
       loginWithGoogle: async () => {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
@@ -43,9 +55,15 @@ export const useAuthStore = create(
       logout: async () => {
         await supabase.auth.signOut();
         set({ isAuthenticated: false, user: null });
+        
+        // Clear persistence
+        localStorage.removeItem('fintrack-auth-v1');
         localStorage.removeItem('fintrack-transactions-v2');
         localStorage.removeItem('fintrack-budgets-v1');
         localStorage.removeItem('fintrack-portfolio-v1');
+        
+        // Force reload to clear in-memory stores and start fresh
+        window.location.reload();
       },
     }),
     {

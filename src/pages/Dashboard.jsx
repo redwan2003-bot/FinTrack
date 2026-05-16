@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus, Wallet, TrendingUp, TrendingDown, DollarSign, ArrowRight } from 'lucide-react';
 import { useTransactionStore } from '../store/useTransactionStore';
 import { usePortfolioStore } from '../store/usePortfolioStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/dateUtils';
 import StatCard          from '../components/ui/StatCard';
@@ -31,7 +32,9 @@ export default function Dashboard() {
     // FIX #8: real month-over-month delta
     getMonthDelta,
     getNetWorthDelta,
+    retrySync
   } = useTransactionStore();
+  const { user } = useAuthStore();
   const { getNetWorth } = usePortfolioStore();
   const portfolioTotal = getNetWorth();
 
@@ -50,14 +53,20 @@ export default function Dashboard() {
     .slice(0, 6);
 
   return (
-    <div className="page">
+    <main className="page">
+      <h1 className="sr-only">Dashboard - Financial Overview</h1>
+      
       {/* Page Header */}
-      <div className="page-header">
+      <header className="page-header">
         <div />
-        <button className="btn btn-primary" onClick={() => setShowAdd(true)} aria-label="Add new transaction">
+        <button 
+          className="btn btn-primary" 
+          onClick={() => setShowAdd(true)} 
+          aria-label="Add new transaction"
+        >
           <Plus size={16} aria-hidden="true" /> {t('add_transaction')}
         </button>
-      </div>
+      </header>
 
         <div className="stats-grid">
           <StatCard
@@ -141,7 +150,22 @@ export default function Dashboard() {
                   transition={{ delay: 0.05 * i }}
                 >
                   <div className="txn-info">
-                    <div className="txn-desc">{t.description}</div>
+                    <div className="txn-desc">
+                      {t.description}
+                      {t.status === 'pending' && (
+                        <span className="status-dot syncing" title="Syncing..." aria-label="Syncing"></span>
+                      )}
+                      {t.status === 'failed' && (
+                        <button 
+                          className="status-dot failed" 
+                          title="Sync failed. Click to retry."
+                          onClick={() => retrySync(t.id, user?.id)}
+                          aria-label="Sync failed. Click to retry."
+                        >
+                          !
+                        </button>
+                      )}
+                    </div>
                     <div className="txn-meta">
                       <Badge categoryId={t.categoryId} size="sm" />
                       <span className="txn-date">{formatDate(t.date)}</span>
@@ -159,6 +183,6 @@ export default function Dashboard() {
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t('add_transaction')}>
         <TransactionForm onClose={() => setShowAdd(false)} />
       </Modal>
-    </div>
+    </main>
   );
 }

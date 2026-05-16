@@ -3,51 +3,14 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { format, subDays, parseISO, isBefore, isEqual } from 'date-fns';
 import { supabase } from '../lib/supabase';
+import toast from 'react-hot-toast';
 
 const d = (daysAgo) => format(subDays(new Date(), daysAgo), 'yyyy-MM-dd');
 const m = (monthsAgo, day) =>
   format(new Date(new Date().getFullYear(), new Date().getMonth() - monthsAgo, day), 'yyyy-MM-dd');
 
-const SEED = [
-  // ... (keeping SEED for guest view)
-  { id: 's1',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(0,1)  },
-  { id: 's2',  type: 'income',  amountCents: 150000, description: 'Freelance Project',    merchantName: 'Client Co.',         categoryId: 'income', date: m(0,10) },
-  { id: 's3',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(1,1)  },
-  { id: 's4',  type: 'income',  amountCents: 80000,  description: 'Side Project Payment', merchantName: 'Upwork',             categoryId: 'income', date: m(1,15) },
-  { id: 's5',  type: 'income',  amountCents: 500000, description: 'Monthly Salary',       merchantName: 'TechCorp Inc',       categoryId: 'income', date: m(2,1)  },
-  { id: 's6',  type: 'expense', amountCents: 4200,   description: 'Breakfast',            merchantName: 'Blue Bottle Coffee', categoryId: 'food',   date: d(1)   },
-  { id: 's7',  type: 'expense', amountCents: 12800,  description: 'Team Lunch',           merchantName: 'Chipotle',           categoryId: 'food',   date: d(3)   },
-  { id: 's8',  type: 'expense', amountCents: 6500,   description: 'Dinner',               merchantName: 'Pho 99',             categoryId: 'food',   date: d(5)   },
-  { id: 's9',  type: 'expense', amountCents: 8900,   description: 'Groceries',            merchantName: 'Whole Foods',        categoryId: 'food',   date: d(7)   },
-  { id: 's10', type: 'expense', amountCents: 5500,   description: 'Cafe & Work',          merchantName: 'Starbucks',          categoryId: 'food',   date: d(9)   },
-  { id: 's11', type: 'expense', amountCents: 14200,  description: 'Weekend Brunch',       merchantName: 'The Egg Shop',       categoryId: 'food',   date: d(11)  },
-  { id: 's12', type: 'expense', amountCents: 9800,   description: 'Groceries',            merchantName: "Trader Joe's",       categoryId: 'food',   date: m(1,18) },
-  { id: 's13', type: 'expense', amountCents: 2400,   description: 'Uber to Office',       merchantName: 'Uber',               categoryId: 'transport', date: d(2)   },
-  { id: 's14', type: 'expense', amountCents: 5800,   description: 'Gas',                  merchantName: 'Shell',              categoryId: 'transport', date: d(8)   },
-  { id: 's15', type: 'expense', amountCents: 3200,   description: 'Metro Card Top-up',    merchantName: 'MTA',                categoryId: 'transport', date: d(14)  },
-  { id: 's16', type: 'expense', amountCents: 1900,   description: 'Lyft Ride',            merchantName: 'Lyft',               categoryId: 'transport', date: m(1,22) },
-  { id: 's17', type: 'expense', amountCents: 150000, description: 'Rent',                 merchantName: 'Landlord',           categoryId: 'bills', date: m(0,1)  },
-  { id: 's18', type: 'expense', amountCents: 9900,   description: 'Internet',             merchantName: 'Comcast',            categoryId: 'bills', date: m(0,5)  },
-  { id: 's19', type: 'expense', amountCents: 7200,   description: 'Electricity',          merchantName: 'Con Edison',         categoryId: 'bills', date: m(0,8)  },
-  { id: 's20', type: 'expense', amountCents: 4500,   description: 'Phone Bill',           merchantName: 'T-Mobile',           categoryId: 'bills', date: m(0,10) },
-  { id: 's21', type: 'expense', amountCents: 150000, description: 'Rent',                 merchantName: 'Landlord',           categoryId: 'bills', date: m(1,1)  },
-  { id: 's22', type: 'expense', amountCents: 9900,   description: 'Internet',             merchantName: 'Comcast',            categoryId: 'bills', date: m(1,5)  },
-  { id: 's23', type: 'expense', amountCents: 1599,   description: 'Netflix',              merchantName: 'Netflix',            categoryId: 'entertainment', date: m(0,3) },
-  { id: 's24', type: 'expense', amountCents: 999,    description: 'Spotify',              merchantName: 'Spotify',            categoryId: 'entertainment', date: m(0,3) },
-  { id: 's25', type: 'expense', amountCents: 3600,   description: 'Movie Night',          merchantName: 'AMC Theatres',       categoryId: 'entertainment', date: d(6)  },
-  { id: 's26', type: 'expense', amountCents: 4999,   description: 'Gaming',               merchantName: 'Steam',              categoryId: 'entertainment', date: d(12) },
-  { id: 's27', type: 'expense', amountCents: 15000,  description: 'New Headphones',       merchantName: 'Best Buy',           categoryId: 'shopping', date: d(4)   },
-  { id: 's28', type: 'expense', amountCents: 8700,   description: 'Clothing',             merchantName: 'Zara',               categoryId: 'shopping', date: d(10)  },
-  { id: 's29', type: 'expense', amountCents: 5400,   description: 'Amazon Order',         merchantName: 'Amazon',             categoryId: 'shopping', date: d(15)  },
-  { id: 's30', type: 'expense', amountCents: 23000,  description: 'Laptop Stand',         merchantName: 'Apple Store',        categoryId: 'shopping', date: m(1,20) },
-  { id: 's31', type: 'expense', amountCents: 4000,   description: 'Gym Membership',       merchantName: 'Planet Fitness',     categoryId: 'health', date: m(0,1)  },
-  { id: 's32', type: 'expense', amountCents: 2500,   description: 'Pharmacy',             merchantName: 'CVS',                categoryId: 'health', date: d(13)  },
-  { id: 's33', type: 'expense', amountCents: 15000,  description: 'Doctor Visit',         merchantName: 'City Medical',       categoryId: 'health', date: m(1,12) },
-  { id: 's34', type: 'expense', amountCents: 38000,  description: 'Flight Tickets',       merchantName: 'Delta Airlines',     categoryId: 'travel', date: m(1,8)  },
-  { id: 's35', type: 'expense', amountCents: 22000,  description: 'Hotel Stay',           merchantName: 'Marriott',           categoryId: 'travel', date: m(1,8)  },
-  { id: 's36', type: 'expense', amountCents: 50000,  description: 'Emergency Fund',       merchantName: 'Savings Account',    categoryId: 'savings', date: m(0,2), status: 'reconciled' },
-  { id: 's37', type: 'expense', amountCents: 50000,  description: 'Emergency Fund',       merchantName: 'Savings Account',    categoryId: 'savings', date: m(1,2), status: 'cleared' },
-];
+const SEED = [];
+
 
 const SEED_VERSION = 'v2.1';
 const refreshSeedDates = (state) => {
@@ -112,12 +75,19 @@ export const useTransactionStore = create(
       setLockDate: (date) => set({ lockDate: date }),
 
       addTransaction: async (data, userId) => {
+        if (!userId) {
+          toast.error('Please login to add transactions');
+          return;
+        }
         const tempId = uuid();
         const txnDate = parseISO(data.date);
         
         if (get().lockDate) {
           const lockDate = parseISO(get().lockDate);
-          if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) return;
+          if (isBefore(txnDate, lockDate) || isEqual(txnDate, lockDate)) {
+            toast.error('Cannot add transactions before lock date');
+            return;
+          }
         }
 
         // Optimistic UI
@@ -129,34 +99,73 @@ export const useTransactionStore = create(
         };
         set(s => ({ transactions: [newTxn, ...s.transactions] }));
 
-        if (userId) {
-          const { error } = await supabase.from('transactions').insert([{
-            id: tempId,
-            user_id: userId,
-            date: data.date,
-            description: data.description,
-            amount_cents: data.amountCents,
-            category_id: data.categoryId,
-            type: data.type,
-            merchant: data.merchantName,
-            status: 'active'
-          }]);
-          if (error) {
-            console.error('Sync failed:', error);
-            // Revert on error
-            set(s => ({ transactions: s.transactions.filter(t => t.id !== tempId) }));
-          }
+        const { error } = await supabase.from('transactions').insert([{
+          id: tempId,
+          user_id: userId,
+          date: data.date,
+          description: data.description,
+          amount_cents: data.amountCents,
+          category_id: data.categoryId,
+          type: data.type,
+          merchant: data.merchantName,
+          status: 'active'
+        }]);
+
+        if (error) {
+          console.error('Sync failed:', error);
+          toast.error('Sync failed. Transaction saved locally.');
+          set(s => ({ 
+            transactions: s.transactions.map(t => t.id === tempId ? { ...t, status: 'failed' } : t) 
+          }));
+        } else {
+          set(s => ({ 
+            transactions: s.transactions.map(t => t.id === tempId ? { ...t, status: 'active' } : t) 
+          }));
+        }
+      },
+
+      retrySync: async (id, userId) => {
+        const txn = get().transactions.find(t => t.id === id);
+        if (!txn || txn.status !== 'failed') return;
+
+        set(s => ({ 
+          transactions: s.transactions.map(t => t.id === id ? { ...t, status: 'pending' } : t) 
+        }));
+
+        const { error } = await supabase.from('transactions').insert([{
+          id: txn.id,
+          user_id: userId,
+          date: txn.date,
+          description: txn.description,
+          amount_cents: txn.amountCents,
+          category_id: txn.categoryId,
+          type: txn.type,
+          merchant: txn.merchantName,
+          status: 'active'
+        }]);
+
+        if (error) {
+          toast.error('Retry failed');
+          set(s => ({ 
+            transactions: s.transactions.map(t => t.id === id ? { ...t, status: 'failed' } : t) 
+          }));
+        } else {
+          toast.success('Synced successfully');
+          set(s => ({ 
+            transactions: s.transactions.map(t => t.id === id ? { ...t, status: 'active' } : t) 
+          }));
         }
       },
 
       updateTransaction: async (id, data, userId) => {
+        if (!userId) return;
         const oldTxns = get().transactions;
         // Optimistic UI
         set(s => ({
           transactions: s.transactions.map(t => t.id === id ? { ...t, ...data } : t)
         }));
 
-        if (userId && !id.startsWith('s')) {
+        if (!id.startsWith('s')) {
           const { error } = await supabase.from('transactions').update({
             date: data.date,
             description: data.description,
@@ -170,12 +179,14 @@ export const useTransactionStore = create(
 
           if (error) {
             console.error('Sync failed:', error);
+            toast.error('Sync failed');
             set({ transactions: oldTxns });
           }
         }
       },
 
       deleteTransaction: async (id, userId) => {
+        if (!userId) return;
         const txn = get().transactions.find(t => t.id === id);
         if (!txn || txn.status === 'voided' || txn.status === 'reconciled') return;
 
@@ -198,7 +209,7 @@ export const useTransactionStore = create(
           ]
         }));
 
-        if (userId && !id.startsWith('s')) {
+        if (!id.startsWith('s')) {
           const { error: voidError } = await supabase.from('transactions').update({ status: 'voided' }).eq('id', id);
           const { error: revError } = await supabase.from('transactions').insert([{
             id: reversingEntry.id,
@@ -214,6 +225,7 @@ export const useTransactionStore = create(
 
           if (voidError || revError) {
             console.error('Void sync failed');
+            toast.error('Void sync failed');
             set({ transactions: oldTxns });
           }
         }
@@ -303,8 +315,8 @@ export const useTransactionStore = create(
       },
     }),
     { 
-      name: 'fintrack-transactions-v2',
-      version: 1,
+      name: 'fintrack-transactions-v3',
+      version: 2,
       migrate: (persistedState) => persistedState,
       onRehydrateStorage: () => (state) => {
         if (state) {
